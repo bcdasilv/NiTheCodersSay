@@ -25,6 +25,11 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  spotify: ^0.2.0
+  password: ^1.0.0
+  device_info: ^0.4.1+4
+  dash_chat: ^1.0.15
+  sqflite: ^1.2.0
   flutter_test:
     sdk: flutter
 
