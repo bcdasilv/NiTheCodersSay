@@ -1,14 +1,12 @@
-import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
-class JamView extends StatelessWidget {
+class jamView extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
-        return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-                middle: const Text('Jam'),
+        return Scaffold(
+            appBar: AppBar(
+                title: Text("Jam"),
             ),
-            child: Container(),
         );
     }
 }

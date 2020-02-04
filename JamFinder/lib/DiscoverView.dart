@@ -1,14 +1,12 @@
-import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 
-class DiscoverView extends StatelessWidget {
+class discoverView extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
-        return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-                middle: const Text('Discover'),
+        return Scaffold(
+            appBar: AppBar(
+                title: Text("Discover"),
             ),
-            child: Container(),
         );
     }
 }
