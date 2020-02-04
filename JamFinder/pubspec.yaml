@@ -25,7 +25,10 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^0.1.2
-  intl: ^0.15.7
+  intl: ^0.16.0
+  password: ^1.0.0
+  spotify: ^0.2.0
+  dash_chat: ^1.0.15
   provider: ^3.0.0+1
   shrine_images: ^1.0.0
 
@@ -33,3 +36,4 @@ dev_dependencies:
   pedantic: ^1.8.0
 
 flutter:
+    uses-material-design: true
