@@ -20,7 +20,6 @@ class _chatViewState extends State<chatView> {
   final ChatUser user = ChatUser(
     name: "Fayeed",
     uid: "123456789",
-    avatar: "https://www.wrappixel.com/ampleadmin/assets/images/users/4.jpg",
   );
 
   final ChatUser otherUser = ChatUser(
@@ -87,7 +86,7 @@ class _chatViewState extends State<chatView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat App"),
+        title: Text("Chat"),
       ),
       body: StreamBuilder(
           stream: Firestore.instance.collection('messages').snapshots(),
