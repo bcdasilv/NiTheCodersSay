@@ -21,6 +21,9 @@ environment:
   flutter: ^1.7.0
 
 dependencies:
+  datetime_picker_formfield: ^0.1.8
+  crypto: ^2.1.4
+  http: ^0.12.0+4
   flutter:
     sdk: flutter
 
@@ -32,6 +35,9 @@ dependencies:
 
 dev_dependencies:
   pedantic: ^1.8.0
+  dependencies:
+
+
 
 flutter:
     uses-material-design: true

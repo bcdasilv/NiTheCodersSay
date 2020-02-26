@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'chatView.dart';
 import 'jamView.dart';
+import 'loginView.dart';
+import 'registerView.dart';
 import 'discoverView.dart';
+import 'loginView.dart';
 
 class JamFinderApp extends StatelessWidget {
     @override
@@ -11,7 +14,9 @@ class JamFinderApp extends StatelessWidget {
             theme: ThemeData(
                 primarySwatch: Colors.indigo,
             ),
-            home: JamFinderTabView(title: 'JamFinder'),
+            home: Scaffold(
+                body: registerField(),
+            ),
         );
     }
 }
