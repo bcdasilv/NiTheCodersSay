@@ -6,6 +6,15 @@ class jamView extends StatelessWidget {
         return Scaffold(
             appBar: AppBar(
                 title: Text("Jam"),
+                actions: <Widget>[
+                    IconButton(
+                        icon: Image.asset('assets/icon/icon.png'),
+                        iconSize: 50,
+                        onPressed: () {
+                            Navigator.pushNamed(context, '/myProfileView');
+                        },
+                    ),
+                ],
             ),
         );
     }

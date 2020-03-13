@@ -6,7 +6,16 @@ class discoverView extends StatelessWidget {
         return Scaffold(
             appBar: AppBar(
                 title: Text("Discover"),
-            ),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Image.asset('assets/icon/icon.png'),
+                    iconSize: 50,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/myProfileView');
+                    },
+                  ),
+                ]
+            )
         );
     }
 }

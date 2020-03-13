@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class loginField extends StatefulWidget {
   @override
@@ -31,13 +33,14 @@ class loginFieldState extends State<loginField> {
   final _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
+  String hashString = '';
 
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("LOGIN"),
+          title: Text("Login"),
         ),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +60,12 @@ class loginFieldState extends State<loginField> {
                           padding: EdgeInsets.symmetric(vertical: 15.0),
                           child: FittedBox(
                             fit: BoxFit.fill, // otherwise the logo will be tiny
-                            child: const FlutterLogo(),
+                            child: Image.asset(
+                              "assets/icon/icon.png",
+                              height: 400,
+                              width: 400,
+                              fit: BoxFit.fitWidth,
+                            ),
                           ),
                         )),
                     Padding(
@@ -91,9 +99,30 @@ class loginFieldState extends State<loginField> {
                         labelText: 'Password',
                       ),
                     ),
-                    RaisedButton(
-                      child: Text("Login"),
-                      onPressed: _submitForm,
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: RaisedButton(
+                          child: Text("Login"),
+                          onPressed: _submitForm,
+                        ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Text(
+                        'Need an account?',
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: RaisedButton(
+                        child: Text("Register"),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -113,25 +142,31 @@ class loginFieldState extends State<loginField> {
       //final hash = Password.hash(passwordController.text, new PBKDF2());
       final hash = sha512.convert(utf8.encode(passwordController.text));
 
+      hashString = "$hash";
+
       final response = await http.post('http://jam.smpark.in/login', body: { 'email': emailController.text, 'password': "$hash" } );
 
       if(response.statusCode == 200) {
-        Scaffold
-            .of(context)
-            .showSnackBar(SnackBar(content: Text('Login successful')));
-      }
+        Navigator.pushNamed(context, '/discover');
+
+    }
       else {
-        Scaffold
-            .of(context)
-            .showSnackBar(SnackBar(content:
-              Text('Incorrect email or password')));
+        return Alert(context: context, title: "Login Unsuccessful").show();
       }
     }
     else {
-      Scaffold
-          .of(context)
-          .showSnackBar(SnackBar(content: Text('fill out fields properly')));
+      return Alert(context: context, title: "Please fill out the fields properly").show();
     }
+  }
+
+  _saveCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    prefs.setString('email', emailController.text);
+
+    prefs.setString('password', hashString);
+
+    print('saved email and password: ' + hashString);
   }
 
 }

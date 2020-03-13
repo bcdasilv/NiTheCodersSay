@@ -24,6 +24,10 @@ dependencies:
   datetime_picker_formfield: ^0.1.8
   crypto: ^2.1.4
   http: ^0.12.0+4
+  rflutter_alert: ^1.0.2
+  image_picker: ^0.6.3+4
+  image: 2.1.12
+  shared_preferences: ^0.4.3
   flutter:
     sdk: flutter
 
@@ -35,9 +39,17 @@ dependencies:
 
 dev_dependencies:
   pedantic: ^1.8.0
+  flutter_launcher_icons: "^0.7.3"
   dependencies:
 
 
 
 flutter:
     uses-material-design: true
+    assets:
+      - "assets/icon/icon.png"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/icon/icon.png"
