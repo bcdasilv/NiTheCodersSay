@@ -1,6 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
 
-class initialView extends StatelessWidget {
+
+class initialView extends StatefulWidget {
+
+  @override
+  State createState() => new initialViewState();
+}
+
+class initialViewState extends State<initialView> {
+  var prefs;
+
+  @override
+  void initState() {
+    SharedPreferences.getInstance().then((result) {
+      print("email" + result.getString('email'));
+      String email = result.getString('email');
+      String password = result.getString('password');
+      if (email != null && password != null) {
+        http.post('http://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
+
+          if(response.statusCode == 200) {
+            Navigator.pushNamed(context, '/discover');
+          }
+
+        });
+      }
+    });
+  }
+
+//  String email = prefs.getString('email');
+//  String password = prefs.getString('password');
+//  print('saved email and password: ' + password);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
