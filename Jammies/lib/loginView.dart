@@ -147,9 +147,8 @@ class loginFieldState extends State<loginField> {
       final response = await http.post('http://jam.smpark.in/login', body: { 'email': emailController.text, 'password': "$hash" } );
 
       if(response.statusCode == 200) {
-        Navigator.pushNamed(context, '/discover');
-
-    }
+        Navigator.pushNamedAndRemoveUntil(context, '/discover', (_) => false);
+      }
       else {
         return Alert(context: context, title: "Login Unsuccessful").show();
       }
