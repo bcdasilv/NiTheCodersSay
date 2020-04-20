@@ -6,7 +6,15 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class Profile {
+  String bio;
+  String name;
+  Profile(this.name, this.bio);
+}
+
 class myProfileView extends StatelessWidget {
+
+  Future<Profile> profile;
 
   var name = "";
   var bio = "";
@@ -19,7 +27,7 @@ class myProfileView extends StatelessWidget {
     var width = screenSize.width;
     var height = screenSize.height;
 
-    _getProfileInfo();
+    profile = _getProfileInfo();
 
     return Scaffold(
       appBar: AppBar(
@@ -27,55 +35,63 @@ class myProfileView extends StatelessWidget {
       ),
       body: SafeArea(
 
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-         Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.indigo,
-                    //backgroundImage: AssetImage(''),
+      child: FutureBuilder<Profile>(
+          future: profile,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              name = snapshot.data.name;
+              bio = snapshot.data.bio;
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.indigo,
+                      //backgroundImage: AssetImage(''),
+                    ),
                   ),
-                ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Text(
-                name,
-                  style: TextStyle(fontWeight: FontWeight.bold)
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Bio\n",
-                  style: TextStyle(fontWeight: FontWeight.bold)
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                bio,
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: RaisedButton(
-                color: Colors.red,
-                child: Text("Edit"),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/editProfileView');
-                },
-              ),
-            ),
-          ],
-            ),
-      ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                        name,
+                        style: TextStyle(fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                        "Bio\n",
+                        style: TextStyle(fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      bio,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: RaisedButton(
+                      color: Colors.red,
+                      child: Text("Edit"),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/editProfileView');
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
+            return Center(child: CircularProgressIndicator());
+          }))
     );
   }
 
-  _getProfileInfo() async {
+  Future<Profile> _getProfileInfo() async {
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -88,13 +104,13 @@ class myProfileView extends StatelessWidget {
 
     print(response.body);
 
-    //var test = '{"bio": "Test bio","name": "Test Testington"}';
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-    name = jsonResponse['name'];
-    bio = jsonResponse['bio'];
+    Profile p = new Profile(jsonResponse['name'], jsonResponse['bio']);
 
     print(jsonResponse['bio']);
+
+    return p;
 
   }
 

@@ -12,12 +12,12 @@ class JamFinderApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'JamFinder',
+      title: 'Jammies',
       theme: ThemeData(
 //        brightness: Brightness.dark,
         primarySwatch: Colors.indigo,
       ),
-      initialRoute: '/',
+      initialRoute: '/jam',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => initialView(),

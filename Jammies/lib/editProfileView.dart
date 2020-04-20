@@ -186,13 +186,4 @@ class editProfileState extends State<editProfileView> {
 }
 
 
-_getName()  {
-  return 'Chloe';
-}
-
-_getBio()  {
-  return 'bio here';
-}
-
-
 
