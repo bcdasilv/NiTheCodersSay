@@ -178,7 +178,7 @@ class _JamView extends State<jamView>  {
         top: cards[i].marginTop,
 
         child: Dismissible(
-          key: Key(cards[i].name),
+          key: UniqueKey(),
           background: slideRightBackground(cards[i].id),
           secondaryBackground: slideLeftBackground(),
           onDismissed: (direction) {
@@ -195,7 +195,7 @@ class _JamView extends State<jamView>  {
             color: Colors.lightBlue[50],
             shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Container(width: 300, height: 600, child: profileJamView(cards[i].name, cards[i].bio)),
+            child: Container(width: 300, height: 530, child: profileJamView(cards[i].name, cards[i].bio)),
           ),
         )
       ),
@@ -234,7 +234,7 @@ class _JamView extends State<jamView>  {
 
 
     final response = await http.post('http://jam.smpark.in/match', headers: header, body: { 'matcher_email': email, 'matchee_id': id.toString() } );
-    if(response.statusCode != 200) {
+    if(response.statusCode == 800) {
       return   Alert(context: context,
         type: AlertType.error,
         title: "Something went wrong :(",
