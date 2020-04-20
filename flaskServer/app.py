@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_api import status
 import os
 import hashlib
+from zipcode_distance import *
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = '/home/smparkin/uploads/'
@@ -186,12 +187,20 @@ def updateProfile():
 def getProfile():
     email = request.headers['email']
     password = request.headers['password']
+    try:
+        userid = request.headers['userid']
+    except:
+        userid = None
 
     valid = verify(email, password)
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
-    user = Users.query.filter_by(email=email).first()
+    if userid == None:
+        user = Users.query.filter_by(email=email).first()
+    else:
+        user = Users.query.filter_by(id=userid).first()
+
     if user == None:
         return Response("{'error':'No such user'}", status=422, mimetype='application/json')
 
@@ -203,6 +212,67 @@ def getProfile():
     #about_me = profile.about_me
     bio = profile.bio
     return jsonify(name=name, bio=bio)
+
+def distance(zip1, zip2):
+    z1 = select_zipcode(zip1)
+    z2 = select_zipcode(zip2)
+    if not (z1) or not (z2):
+        return None
+    return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+
+
+@app.route('/getNearby', methods=["GET"])
+def getNearby():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    userZipcode = user.zipcode
+
+    #Var to control how many people are shown to the user
+    nearbyLimit = 50
+
+    #Get people in the same zipcode as user first in a list
+    sameZipcode = Users.query.filter(Users.zipcode.like(userZipcode), Users.id != user.id).all()
+
+    #Get same zipcode people's id in result list
+    res = []
+    count = 0
+    for person in sameZipcode:
+        if count < nearbyLimit:
+            res.append(person.id)
+            count+=1
+        else:
+            break
+
+    #Look at other zipcodes if limit not reached
+    if count != nearbyLimit:
+
+        #Filter people already in res
+        #Can also filter_by zipcode!=userZipcode instead
+        otherZipcode = Users.query.filter(Users.id.notin_(res), Users.id != user.id).limit(nearbyLimit-count).all()
+
+        #Array of tuples: (id, distance)
+        temp = []
+        for person in otherZipcode:
+            #Stephen's distance function goes below with args: user.zipcode and person.zipcode
+            dist = distance(userZipcode, person.zipcode)             
+            if dist != None:                 
+                temp.append((person.id, dist))
+
+        #Sort based on distance and add to result list
+        temp.sort(key=lambda x: x[1])
+        res+= [i[0] for i in temp]
+
+    return jsonify(res)
+
 
 
 if __name__ == '__main__':
