@@ -17,7 +17,7 @@ class JamFinderApp extends StatelessWidget {
 //        brightness: Brightness.dark,
         primarySwatch: Colors.indigo,
       ),
-      initialRoute: '/jam',
+      initialRoute: '/',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => initialView(),
@@ -59,7 +59,7 @@ class _JamFinderTabViewState extends State<JamFinderTabView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JamFinder'),
+        title: const Text('Jammies'),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

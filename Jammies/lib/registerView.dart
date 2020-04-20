@@ -247,7 +247,7 @@ class registerFieldState extends State<registerField> {
       'zipcode': zcController.text, 'dob': dateController.text, 'username': userNameController.text} );
 
       if(response.statusCode == 200) {
-        Navigator.pushNamed(context, '/discover');
+        Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
       }
       else {
         return Alert(context: context, title: response.body).show();

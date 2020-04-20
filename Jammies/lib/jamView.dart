@@ -61,8 +61,7 @@ class _JamView extends State<jamView>  {
             ),
           ],
         ),
-        body:
-        Center(
+        body: Center(
           child: FutureBuilder<List<ProfileCard>>(
             future: futureCards,
             builder: (context, snapshot) {
@@ -74,9 +73,55 @@ class _JamView extends State<jamView>  {
               // By default, show a loading spinner.
               return CircularProgressIndicator();
             }
-        )
-      )
+          )
+          ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(
+                  Icons.mail_outline,
+                  color: Colors.indigo,
+              ),
+              title: Text(
+                'Chat',
+                style: TextStyle(color: Colors.indigo),
+              ),
+            ),
+            BottomNavigationBarItem(
+//              icon: Icon(Icons.music_note, Colors.indigo),
+              icon: Icon(
+                Icons.music_note,
+                color: Colors.purpleAccent,
+              ),
+              title: Text(
+                  'Jam',
+                  style: TextStyle(color: Colors.purpleAccent),
+              ),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                  Icons.map,
+                  color: Colors.indigo,
+              ),
+              title: Text(
+                  'Discover',
+                  style: TextStyle(color: Colors.indigo),
+              ),
+            ),
+          ],
+          onTap: _onItemTapped,
+        ),
     );
+  }
+
+  void _onItemTapped(int index) {
+    if (index == 0) {
+      Navigator.pushNamedAndRemoveUntil(context, '/chat', (_) => false);
+    } else if (index == 1) {
+      Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
+    } else if (index == 2) {
+      Navigator.pushNamedAndRemoveUntil(context, '/discover', (_) => false);
+    }
   }
 
   //populate cards with ProfileCards with data from server
@@ -110,10 +155,6 @@ class _JamView extends State<jamView>  {
 
       name = jsonResponse['name'];
       bio = jsonResponse['bio'];
-
-      print("User: " + name);
-      print("email: " + email);
-      print("id: " + idList[i].toString());
 
       cards.add(ProfileCard(name, bio, null, 30.0, idList[i]));
 

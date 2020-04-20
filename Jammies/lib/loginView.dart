@@ -148,7 +148,7 @@ class loginFieldState extends State<loginField> {
 
       if(response.statusCode == 200) {
         _saveCredentials();
-        Navigator.pushNamed(context, '/discover');
+        Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
       }
       else {
         return Alert(context: context, title: "Login Unsuccessful").show();

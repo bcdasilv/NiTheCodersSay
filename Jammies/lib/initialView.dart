@@ -23,7 +23,7 @@ class initialViewState extends State<initialView> {
         http.post('http://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
 
           if(response.statusCode == 200) {
-            Navigator.pushNamed(context, '/discover');
+            Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
           }
 
         });
