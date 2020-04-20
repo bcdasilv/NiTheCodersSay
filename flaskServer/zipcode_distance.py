@@ -8,19 +8,10 @@ def build_metadata():
     metadata = sqlalchemy.MetaData(db)
     metadata.bind.echo = False
     metadata.bind.text_factory = str
-
     return metadata
 
 def select_zipcode(zipcode):
-    fields = (
-        'zip',
-        'city',
-        'state',
-        'lat',
-        'long',
-        'timezone',
-        'dst',
-        )
+    fields = ('zip','city','state','lat','long','timezone','dst')
     metadata = build_metadata()
     zipcodes_table = sqlalchemy.Table('zipcodes', metadata, autoload=True)
     result = zipcodes_table.select(zipcodes_table.c.zip == zipcode)
@@ -43,5 +34,4 @@ def haversine(lat1, long1, lat2, long2):
         * math.cos(math.radians(lat2)) * math.sin(dlong/2) * math.sin(dlong/2)
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     d = radius * c
-
     return d

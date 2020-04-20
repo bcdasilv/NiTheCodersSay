@@ -219,8 +219,7 @@ def distance(zip1, zip2):
     if not (z1) or not (z2):
         return None
     return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
-
-
+  
 @app.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
