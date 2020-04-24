@@ -1,6 +1,7 @@
 Coding Style Guides:
 
 For dart code: https://dart.dev/guides/language/effective-dart/style
+Note: to run analysis on code, use 'flutter analyze'
 
 For python code in flask backend: https://www.python.org/dev/peps/pep-0008/
 
