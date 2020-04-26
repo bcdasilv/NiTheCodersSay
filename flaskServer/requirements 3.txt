@@ -1,6 +1,0 @@
-flask
-flask_api
-flask_sqlalchemy
-pytest
-mysqlclient
-pep8
