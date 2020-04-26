@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/smparkin/NiTheCodersSay.svg?branch=master)](https://travis-ci.com/smparkin/NiTheCodersSay)
+
 Coding Style Guides:
 
 For dart code: https://dart.dev/guides/language/effective-dart/style
