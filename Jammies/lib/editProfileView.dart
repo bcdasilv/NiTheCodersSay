@@ -126,17 +126,17 @@ class editProfileState extends State<editProfileView> {
                   obscureText: false,
               ),
             ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: RaisedButton(
-          child: Text("Submit"),
-          color: Colors.teal[300],
-          onPressed: () {
-            _submitForm(context);
-            Navigator.popUntil(context, ModalRoute.withName('/myProfileView'));
-          },
-        ),
-      ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: RaisedButton(
+                child: Text("Submit"),
+                color: Colors.teal[300],
+                onPressed: () {
+                  _submitForm(context);
+                  Navigator.popUntil(context, ModalRoute.withName('/myProfileView'));
+                },
+              ),
+            ),
           ],
         ),
       ),
