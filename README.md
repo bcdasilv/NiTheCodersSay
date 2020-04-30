@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.com/smparkin/NiTheCodersSay.svg?branch=master)](https://travis-ci.com/smparkin/NiTheCodersSay)
+Back-end: [![Build Status](https://travis-ci.com/smparkin/NiTheCodersSay.svg?branch=master)](https://travis-ci.com/smparkin/NiTheCodersSay)
+
+Front-end: [![Codemagic build status](https://api.codemagic.io/apps/5ea3677d5a66a0207c95b32f/5ea3677d5a66a0207c95b32e/status_badge.svg)](https://codemagic.io/apps/5ea3677d5a66a0207c95b32f/5ea3677d5a66a0207c95b32e/latest_build)
 
 Coding Style Guides:
 
