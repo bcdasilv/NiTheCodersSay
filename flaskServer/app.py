@@ -6,7 +6,7 @@ import hashlib
 from zipcode_distance import *
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/home/smparkin/uploads/'
+UPLOAD_FOLDER = '/home/smparkin/NiTheCodersSay/flaskServer/static/images'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
@@ -49,6 +49,12 @@ class Users(db.Model):
     def __repr__(self):
         return '<User %r>' % self.id
 
+
+@app.route('/', methods=["GET", "POST"])
+def home():
+    message = "Hello there"
+    return render_template('index.html', message=message)
+
 @app.route('/upload', methods=["POST"])
 def upload():
     email = request.headers['email']
@@ -59,9 +65,10 @@ def upload():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
+    user = Users.query.filter_by(email=email).first()
     try:
         image = request.files['file']
-        filename = secure_filename(email)
+        filename = secure_filename(str(user.id))
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return Response("{'status':'Saved image'}", status=200, mimetype='application/json')
     except:
@@ -78,8 +85,9 @@ def download():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
+    user = Users.query.filter_by(email=email).first()
     try:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(email))
+        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(str(user.id)))
         return send_file(filename, mimetype='image/jpg')
     except:
         return Response("{'error':'Unable to retrieve image'}", status=420, mimetype='application/json')
