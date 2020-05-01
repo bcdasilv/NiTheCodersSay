@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Profile {
   String bio;
   String name;
-  Profile(this.name, this.bio);
+  String profilePath;
+  Profile(this.name, this.bio, this.profilePath);
 }
 
 class myProfileView extends StatelessWidget {
@@ -18,6 +19,7 @@ class myProfileView extends StatelessWidget {
 
   var name = "";
   var bio = "";
+  var profilePath = "";
 
   var client = http.Client();
 
@@ -41,6 +43,7 @@ class myProfileView extends StatelessWidget {
             if (snapshot.hasData) {
               name = snapshot.data.name;
               bio = snapshot.data.bio;
+              profilePath = snapshot.data.profilePath;
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,6 +51,7 @@ class myProfileView extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15.0),
                     child: CircleAvatar(
+                    backgroundImage: FileImage(File(profilePath)),
                       radius: 50,
                       backgroundColor: Colors.indigo,
                       //backgroundImage: AssetImage(''),
@@ -93,7 +97,7 @@ class myProfileView extends StatelessWidget {
 
   Future<Profile> _getProfileInfo() async {
 
-    final prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
 
     String email = prefs.getString('email');
     String password = prefs.getString('password');
@@ -106,7 +110,14 @@ class myProfileView extends StatelessWidget {
 
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-    Profile p = new Profile(jsonResponse['name'], jsonResponse['bio']);
+    String path = prefs.get('profile_image');
+
+    if(path == null) {
+      print("Path is null");
+      path = "";
+    }
+
+    Profile p = new Profile(jsonResponse['name'], jsonResponse['bio'], path);
 
     print(jsonResponse['bio']);
 
