@@ -14,6 +14,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
 
+class Matchings(db.Model):
+    matcherId = db.Column(db.Integer, primary_key=True)
+    matcheeId = db.Column(db.Integer, primary_key=True)
+
+    def __init__(self, matcher, matchee):
+        self.matcherId = matcher
+        self.matcheeId = matchee
+
 class Profiles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     about_me = db.Column(db.String(140))
@@ -50,10 +58,42 @@ class Users(db.Model):
         return '<User %r>' % self.id
 
 
+
+@app.route('/match', methods=["POST"])
+def match():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+    try:
+        matcher = data['matcher']
+        matchee = data['matchee']
+    except:
+        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+
+    match = Matchings.query.filter_by(matcherId=matcher).filter_by(matcheeId=matchee).first()
+    if match == None:
+        newMatch = Matchings(matcher, matchee)
+        db.session.add(newMatch)
+        db.session.commit()
+        return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
+    else:
+        return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
+
+
 @app.route('/', methods=["GET", "POST"])
 def home():
     message = "Hello there"
     return render_template('index.html', message=message)
+
 
 @app.route('/upload', methods=["POST"])
 def upload():
@@ -284,7 +324,3 @@ def getNearby():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-
-
-def helloPeril():
-    return True
