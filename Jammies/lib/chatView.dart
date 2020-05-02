@@ -13,6 +13,17 @@ class chatView extends StatefulWidget {
 }
 
 class _ChatView extends State<chatView>{
+    Future<List<String>> names;
+
+
+    @override
+    void initState() {
+        // TODO: implement initState
+        super.initState();
+
+        names = _getMatches();
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -75,4 +86,32 @@ class _ChatView extends State<chatView>{
             Navigator.pushNamedAndRemoveUntil(context, '/discover', (_) => false);
         }
     }
+
+    Future<List<String>> _getMatches() async {
+        final prefs = await SharedPreferences.getInstance();
+        String email = prefs.getString('email');
+        String password = prefs.getString('password');
+        List<String> matchedNames = new List<String>();
+
+        Map<String, String> header = {'email': email, 'password': password};
+
+        final response = await http.get('http://jam.smpark.in/match', headers: header,);
+
+        var idList = (jsonDecode(response.body) as List);
+
+        for (int i = 0; i < idList.length; i++) {
+            Map<String, String> header = {
+                'email': email,
+                'password': password,
+                'userid': idList[i].toString()
+            };
+            var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+
+            Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+            matchedNames.add(jsonResponse['name']);
+        }
+
+        return matchedNames;
+    }
+
 }
