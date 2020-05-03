@@ -95,7 +95,7 @@ class _ChatView extends State<chatView>{
 
         Map<String, String> header = {'email': email, 'password': password};
         print(header);
-        final response = await http.get('http://jam.smpark.in/getMatch', headers: header,);
+        final response = await http.get('http://jam.smpark.in/getMatches', headers: header,);
 
         var idList = (jsonDecode(response.body) as List);
 
