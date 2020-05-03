@@ -7,13 +7,18 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile {
-  String bio;
-  String name;
-  String profilePath;
+  String bio = "";
+  String name = "";
+  String profilePath = "";
   Profile(this.name, this.bio, this.profilePath);
 }
 
-class myProfileView extends StatelessWidget {
+class myProfileView extends StatefulWidget {
+  @override
+  _MyProfileView createState() => _MyProfileView();
+}
+
+class _MyProfileView extends State<myProfileView> {
 
   Future<Profile> profile;
 
@@ -42,8 +47,10 @@ class myProfileView extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               name = snapshot.data.name;
-              bio = snapshot.data.bio;
               profilePath = snapshot.data.profilePath;
+              if (snapshot.data.bio != null) {
+                bio = snapshot.data.bio;
+              }
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,10 +87,30 @@ class myProfileView extends StatelessWidget {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: RaisedButton(
-                      color: Colors.red,
-                      child: Text("Edit"),
+                      color: Colors.indigo,
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
                       onPressed: () {
                         Navigator.pushNamed(context, '/editProfileView');
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: RaisedButton(
+                      color: Colors.teal,
+                      child: Text(
+                        'Log Out',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      onPressed: () {
+                        _logout();
                       },
                     ),
                   ),
@@ -125,6 +152,11 @@ class myProfileView extends StatelessWidget {
 
   }
 
+  void _logout() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
+    Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+  }
 }
 
 

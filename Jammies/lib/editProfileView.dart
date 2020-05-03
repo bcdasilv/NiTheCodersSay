@@ -138,17 +138,17 @@ class editProfileState extends State<editProfileView> {
                   obscureText: false,
               ),
             ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: RaisedButton(
-          child: Text("Submit"),
-          color: Colors.teal[300],
-          onPressed: () {
-            _submitForm(context);
-            Navigator.pushNamed(context, '/myProfileView');
-          },
-        ),
-      ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: RaisedButton(
+                child: Text("Submit"),
+                color: Colors.teal[300],
+                onPressed: () {
+                  _submitForm(context);
+                  Navigator.popUntil(context, ModalRoute.withName('/myProfileView'));
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -167,10 +167,7 @@ class editProfileState extends State<editProfileView> {
 
     print(response.body + " " + response.statusCode.toString());
 
-    Navigator.pushNamed(context, '/myProfileView');
-
-    _upload();
-
+    await _upload();
   }
 
   _getProfileInfo() async {
