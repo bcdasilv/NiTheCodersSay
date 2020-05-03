@@ -5,17 +5,19 @@ class profileJamView extends StatelessWidget {
 
   var name="";
   var bio="";
-  var id;
+  var id = 0;
 
   var client = http.Client();
 
-  profileJamView(this.name,this.bio);
+  profileJamView(this.name,this.bio, this.id);
 
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     var width = screenSize.width;
     var height = screenSize.height;
+
+    print("userid: " + id.toString());
 
     return Scaffold(
       body: SafeArea(
@@ -29,16 +31,12 @@ class profileJamView extends StatelessWidget {
                   child: new Container(
                       width: 190.0,
                       height: 190.0,
-                      decoration: new BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: new DecorationImage(
-                              fit: BoxFit.fill,
-                              image: new NetworkImage(
-                                  "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg")
-                          )
-                      )),
-                  )
-              ),
+                      child: FadeInImage(
+                          image: NetworkImage('http://jam.smpark.in/static/images/' + id.toString()), placeholder: AssetImage("assets/icon/icon.png")
+                      ),
+                  ),
+              )
+            ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Align(

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:async/async.dart';
+import 'package:path_provider/path_provider.dart';
 
 class editProfileView extends StatefulWidget {
   @override
@@ -19,7 +20,18 @@ class editProfileState extends State<editProfileView> {
   }
 
   void _upload() async {
-    print("uploading: ");
+
+    // getting a directory path for saving
+    final directory = await getApplicationDocumentsDirectory();
+    final path = directory.path;
+    print(path);
+    // copy the file to a new path
+    File newFile = await file.copy('$path/profile.png');
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString('profile_image', newFile.path);
+
+    print("uploading to " + newFile.path);
     if (file == null) {
       print("Null file");
       return;
@@ -126,17 +138,17 @@ class editProfileState extends State<editProfileView> {
                   obscureText: false,
               ),
             ),
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: RaisedButton(
-          child: Text("Submit"),
-          color: Colors.teal[300],
-          onPressed: () {
-            _submitForm(context);
-            Navigator.pushNamed(context, '/myProfileView');
-          },
-        ),
-      ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: RaisedButton(
+                child: Text("Submit"),
+                color: Colors.teal[300],
+                onPressed: () {
+                  _submitForm(context);
+                  Navigator.popUntil(context, ModalRoute.withName('/myProfileView'));
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -155,10 +167,7 @@ class editProfileState extends State<editProfileView> {
 
     print(response.body + " " + response.statusCode.toString());
 
-    Navigator.pushNamed(context, '/myProfileView');
-
-    _upload();
-
+    await _upload();
   }
 
   _getProfileInfo() async {

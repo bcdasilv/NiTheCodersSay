@@ -29,23 +29,9 @@ CREATE TABLE IF NOT EXISTS `users`(
   FOREIGN KEY (`id`) REFERENCES profiles(`id`));
 
 CREATE TABLE IF NOT EXISTS `matchings`(
-  `user_1` INT NOT NULL,
-  `user_2` INT NOT NULL,
-  PRIMARY KEY (`user_1`, `user_2`),
-  FOREIGN KEY (`user_1`) REFERENCES profiles(`id`),
-  FOREIGN KEY (`user_2`) REFERENCES profiles(`id`));
+  `matcherId` INT NOT NULL,
+  `matcheeId` INT NOT NULL,
+  PRIMARY KEY (`matcherId`, `matcheeId`),
+  FOREIGN KEY (`matcherId`) REFERENCES profiles(`id`),
+  FOREIGN KEY (`matcheeId`) REFERENCES profiles(`id`));
 
-
-DELIMITER $$
-
-CREATE TRIGGER matchings_sorted_ids_check 
-BEFORE INSERT ON matchings 
-FOR EACH ROW 
-	BEGIN   
-		IF (NEW.user_1 > NEW.user_2) THEN
-			SIGNAL SQLSTATE '45000' 
-			SET MESSAGE_TEXT = 'New user_1 id is greater then user_2 id. Please sort the ids before inserting.';	
-		END IF; 
-	END$$
-
-DELIMITER ;
