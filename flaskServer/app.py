@@ -179,7 +179,7 @@ def login():
     user = Users.query.filter_by(email=email).first()
 
     if (valid):
-        return Response("{'status':'"+str(status)"'}", status=200, mimetype='application/json')
+        return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
     return Response("{'error':'Not valid email or password'}", status=401, mimetype='application/json')
 
 
