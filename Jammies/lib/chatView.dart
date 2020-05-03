@@ -94,8 +94,8 @@ class _ChatView extends State<chatView>{
         List<String> matchedNames = new List<String>();
 
         Map<String, String> header = {'email': email, 'password': password};
-
-        final response = await http.get('http://jam.smpark.in/match', headers: header,);
+        print(header);
+        final response = await http.get('http://jam.smpark.in/getMatch', headers: header,);
 
         var idList = (jsonDecode(response.body) as List);
 
@@ -110,8 +110,9 @@ class _ChatView extends State<chatView>{
             Map<String, dynamic> jsonResponse = jsonDecode(response.body);
             matchedNames.add(jsonResponse['name']);
         }
-
+        print(matchedNames);
         return matchedNames;
+
     }
 
 }
