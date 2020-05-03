@@ -1,16 +1,10 @@
-DROP TABLE IF EXISTS `soundcloud_keys`;
-
 CREATE TABLE IF NOT EXISTS `soundcloud_keys`(
   `id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`));
-  
-DROP TABLE IF EXISTS `spotify_keys`;
 
 CREATE TABLE IF NOT EXISTS `spotify_keys`(
-  `id` INT NOT NULL AUTO_INCREMENT,  -- secret token (to be added later)
+  `id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`));
-
-DROP TABLE IF EXISTS `profiles`;
 
 CREATE TABLE IF NOT EXISTS `profiles`(
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -23,16 +17,35 @@ CREATE TABLE IF NOT EXISTS `profiles`(
   FOREIGN KEY (`spotify_key`) REFERENCES spotify_keys(`id`),
   FOREIGN KEY (`soundcloud_key`) REFERENCES soundcloud_keys(`id`));
 
-DROP TABLE IF EXISTS `users`;
-
 CREATE TABLE IF NOT EXISTS `users`(
   `id` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(30) NOT NULL,
   `username` VARCHAR(20) NOT NULL,
-  `password` VARCHAR(128) NOT NULL, -- SHA256
-  `zipcode` CHAR(5) NOT NULL, -- Just first 5 is enough
+  `password` VARCHAR(128) NOT NULL,
+  `zipcode` CHAR(5) NOT NULL,
   `dob` DATE NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id`) REFERENCES profiles(`id`));
-  
+
+CREATE TABLE IF NOT EXISTS `matchings`(
+  `user_1` INT NOT NULL,
+  `user_2` INT NOT NULL,
+  PRIMARY KEY (`user_1`, `user_2`),
+  FOREIGN KEY (`user_1`) REFERENCES profiles(`id`),
+  FOREIGN KEY (`user_2`) REFERENCES profiles(`id`));
+
+
+DELIMITER $$
+
+CREATE TRIGGER matchings_sorted_ids_check 
+BEFORE INSERT ON matchings 
+FOR EACH ROW 
+	BEGIN   
+		IF (NEW.user_1 > NEW.user_2) THEN
+			SIGNAL SQLSTATE '45000' 
+			SET MESSAGE_TEXT = 'New user_1 id is greater then user_2 id. Please sort the ids before inserting.';	
+		END IF; 
+	END$$
+
+DELIMITER ;
