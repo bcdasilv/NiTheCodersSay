@@ -13,7 +13,9 @@ class chatView extends StatefulWidget {
 }
 
 class _ChatView extends State<chatView>{
-    Future<List<String>> names;
+    Future<List<String>> futureNames;
+
+    List<String> names;
 
 
     @override
@@ -21,7 +23,7 @@ class _ChatView extends State<chatView>{
         // TODO: implement initState
         super.initState();
 
-        names = _getMatches();
+        futureNames = _getMatches();
     }
 
     @override
@@ -38,6 +40,28 @@ class _ChatView extends State<chatView>{
                         },
                     ),
                 ],
+            ),
+            body: Center(
+                child: FutureBuilder<List<String>>(
+                    future: futureNames,
+                    builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                            names = snapshot.data;
+                            return ListView.separated(
+                                itemCount: names.length,
+                                itemBuilder: (context, index) {
+                                    return ListTile(
+                                        title: Text(names[index]),
+                                    );
+                                },
+                                separatorBuilder: (context, index) {
+                                    return Divider();
+                                },
+                            );
+                        }
+                        return Center(child: CircularProgressIndicator());
+                    }
+                )
             ),
             bottomNavigationBar: BottomNavigationBar(
                 items: const <BottomNavigationBarItem>[
