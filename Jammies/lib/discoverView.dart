@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'globals.dart';
 
 class discoverView extends StatefulWidget {
   @override
@@ -14,7 +15,9 @@ class _DiscoverView extends State<discoverView>{
                 title: Text("Discover"),
                 actions: <Widget>[
                   IconButton(
-                    icon: Image.asset('assets/icon/icon.png'),
+                    icon: globals.profilePhoto == null
+                      ? Image.asset( "assets/icon/icon.png")
+                      : Image.file(globals.profilePhoto),
                     iconSize: 50,
                     onPressed: () {
                       Navigator.pushNamed(context, '/myProfileView');
