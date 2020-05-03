@@ -89,6 +89,26 @@ def match():
         return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
 
 
+@app.route('/getMatch', methods=["GET"])
+def getMatch():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    matches = Matchings.query.filter_by(matcheeId=user.id).all()
+    matchList = [i.matcherId for i in matches]
+
+    return jsonify(matchList)
+
+
 @app.route('/', methods=["GET", "POST"])
 def home():
     message = "Hello there"
