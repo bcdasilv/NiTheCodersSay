@@ -49,7 +49,6 @@ class _MyProfileView extends State<myProfileView> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               name = snapshot.data.name;
-              profilePath = snapshot.data.profilePath;
               if (snapshot.data.bio != null) {
                 bio = snapshot.data.bio;
               }
@@ -60,7 +59,6 @@ class _MyProfileView extends State<myProfileView> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 15.0),
                     child: CircleAvatar(
-                    backgroundImage: FileImage(File(profilePath)),
                       radius: 50,
                       backgroundColor: Colors.indigo,
                       backgroundImage: globals.profilePhoto == null
