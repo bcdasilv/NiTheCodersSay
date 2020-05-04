@@ -5,9 +5,6 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'globals.dart';
-import 'package:image_picker_saver/image_picker_saver.dart';
-import 'dart:io';
 
 class loginField extends StatefulWidget {
   @override
@@ -150,7 +147,6 @@ class loginFieldState extends State<loginField> {
       final response = await http.post('http://jam.smpark.in/login', body: { 'email': emailController.text, 'password': "$hash" } );
 
       if(response.statusCode == 200) {
-        _getPhoto(json.decode(response.body.replaceAll("'", '"'))['userid']);
         _saveCredentials();
         Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
       }
@@ -173,14 +169,4 @@ class loginFieldState extends State<loginField> {
     print('saved email and password: ' + hashString);
   }
 
-
-  void _getPhoto(String id) async {
-    http.Response response = await http.get('http://jam.smpark.in/static/images/' + id);
-    var filePath = await ImagePickerSaver.saveFile(
-        fileData: response.bodyBytes);
-    if (filePath.length == 0) {
-      return;
-    }
-    globals.profilePhoto = File(filePath);
-  }
 }

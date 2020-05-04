@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-//import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:async/async.dart';
-import 'package:path_provider/path_provider.dart';
-import 'globals.dart';
-import 'package:image_picker_saver/image_picker_saver.dart';
 
 class editProfileView extends StatefulWidget {
   @override
@@ -17,39 +14,16 @@ class editProfileView extends StatefulWidget {
 class editProfileState extends State<editProfileView> {
   File file;
 
-  Future<File> _getFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = directory.path;
-    bool fileExists = await File('$path/profile.png').exists();
-    if (fileExists) {
-      return file = File('$path/profile.png');
-    }
-    return null;
-  }
-
   void _choose() async {
-    File f = await ImagePickerSaver.pickImage(source: ImageSource.gallery);
-    setState(() {
-      file = f;
-      globals.profilePhoto = f;
-      print(globals.profilePhoto);
-    });
+    file = await ImagePicker.pickImage(source: ImageSource.gallery);
   }
 
   void _upload() async {
-
-    // getting a directory path for saving
-    final directory = await getApplicationDocumentsDirectory();
-    final path = directory.path;
-    print(path);
-
     print("uploading: ");
     if (file == null) {
       print("Null file");
       return;
     }
-
-    file.copy('$path/profile.png'); //copy the file to the new path
 
     print(file.path
         .split("/")
@@ -112,9 +86,7 @@ class editProfileState extends State<editProfileView> {
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.indigo,
-                backgroundImage: globals.profilePhoto == null
-                    ? AssetImage( "assets/icon/icon.png")
-                    : FileImage(globals.profilePhoto),
+                //backgroundImage: AssetImage(''),
               ),
             ),
             Column(
@@ -128,6 +100,9 @@ class editProfileState extends State<editProfileView> {
                     ),
                   ],
                 ),
+                file == file
+                    ? Text('No Image Selected')
+                    : Image.file(file) // This doesn't work
               ],
             ),
             Align(
@@ -151,17 +126,17 @@ class editProfileState extends State<editProfileView> {
                   obscureText: false,
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: RaisedButton(
-                child: Text("Submit"),
-                color: Colors.teal[300],
-                onPressed: () {
-                  _submitForm(context);
-                  Navigator.popUntil(context, ModalRoute.withName('/myProfileView'));
-                },
-              ),
-            ),
+      Align(
+        alignment: Alignment.bottomCenter,
+        child: RaisedButton(
+          child: Text("Submit"),
+          color: Colors.teal[300],
+          onPressed: () {
+            _submitForm(context);
+            Navigator.pushNamed(context, '/myProfileView');
+          },
+        ),
+      ),
           ],
         ),
       ),
@@ -180,7 +155,10 @@ class editProfileState extends State<editProfileView> {
 
     print(response.body + " " + response.statusCode.toString());
 
-    await _upload();
+    Navigator.pushNamed(context, '/myProfileView');
+
+    _upload();
+
   }
 
   _getProfileInfo() async {

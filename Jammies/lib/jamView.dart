@@ -5,8 +5,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'globals.dart';
-
 //reference for swipe cards https://mightytechno.com/flutter-tinder-swipe-cards/
 
 class ProfileCard {
@@ -43,6 +41,7 @@ class _JamView extends State<jamView>  {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     futureCards = populateProfileCards();
 
   }
@@ -54,9 +53,7 @@ class _JamView extends State<jamView>  {
           title: Text("Jam"),
           actions: <Widget>[
             IconButton(
-              icon: globals.profilePhoto == null
-                  ? Image.asset( "assets/icon/icon.png")
-                  : Image.file(globals.profilePhoto),
+              icon: Image.asset('assets/icon/icon.png'),
               iconSize: 50,
               onPressed: () {
                 Navigator.pushNamed(context, '/myProfileView');
@@ -181,7 +178,7 @@ class _JamView extends State<jamView>  {
         top: cards[i].marginTop,
 
         child: Dismissible(
-          key: UniqueKey(),
+          key: Key(cards[i].name),
           background: slideRightBackground(cards[i].id),
           secondaryBackground: slideLeftBackground(),
           onDismissed: (direction) {
@@ -198,7 +195,7 @@ class _JamView extends State<jamView>  {
             color: Colors.lightBlue[50],
             shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Container(width: 300, height: 530, child: profileJamView(cards[i].name, cards[i].bio)),
+            child: Container(width: 300, height: 600, child: profileJamView(cards[i].name, cards[i].bio)),
           ),
         )
       ),
@@ -237,7 +234,7 @@ class _JamView extends State<jamView>  {
 
 
     final response = await http.post('http://jam.smpark.in/match', headers: header, body: { 'matcher_email': email, 'matchee_id': id.toString() } );
-    if(response.statusCode == 800) {
+    if(response.statusCode != 200) {
       return   Alert(context: context,
         type: AlertType.error,
         title: "Something went wrong :(",

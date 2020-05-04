@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'globals.dart';
+
 
 class chatView extends StatefulWidget {
     @override
@@ -20,9 +20,7 @@ class _ChatView extends State<chatView>{
                 title: Text("Chat"),
                 actions: <Widget>[
                     IconButton(
-                        icon: globals.profilePhoto == null
-                            ? Image.asset( "assets/icon/icon.png")
-                            : Image.file(globals.profilePhoto),
+                        icon: Image.asset('assets/icon/icon.png'),
                         iconSize: 50,
                         onPressed: () {
                             Navigator.pushNamed(context, '/myProfileView');

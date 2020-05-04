@@ -3,23 +3,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:async/async.dart';
-import 'package:path_provider/path_provider.dart';
-import 'globals.dart';
 
 class Profile {
-  String bio = "";
-  String name = "";
+  String bio;
+  String name;
   Profile(this.name, this.bio);
 }
 
-class myProfileView extends StatefulWidget {
-  @override
-  _MyProfileView createState() => _MyProfileView();
-}
-
-class _MyProfileView extends State<myProfileView> {
+class myProfileView extends StatelessWidget {
 
   Future<Profile> profile;
 
@@ -47,9 +40,7 @@ class _MyProfileView extends State<myProfileView> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               name = snapshot.data.name;
-              if (snapshot.data.bio != null) {
-                bio = snapshot.data.bio;
-              }
+              bio = snapshot.data.bio;
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -59,9 +50,7 @@ class _MyProfileView extends State<myProfileView> {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.indigo,
-                      backgroundImage: globals.profilePhoto == null
-                        ? AssetImage( "assets/icon/icon.png")
-                        : FileImage(globals.profilePhoto),
+                      //backgroundImage: AssetImage(''),
                     ),
                   ),
                   Padding(
@@ -87,30 +76,10 @@ class _MyProfileView extends State<myProfileView> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: RaisedButton(
-                      color: Colors.indigo,
-                      child: Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
+                      color: Colors.red,
+                      child: Text("Edit"),
                       onPressed: () {
                         Navigator.pushNamed(context, '/editProfileView');
-                      },
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: RaisedButton(
-                      color: Colors.teal,
-                      child: Text(
-                        'Log Out',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      onPressed: () {
-                        _logout();
                       },
                     ),
                   ),
@@ -139,16 +108,12 @@ class _MyProfileView extends State<myProfileView> {
 
     Profile p = new Profile(jsonResponse['name'], jsonResponse['bio']);
 
+    print(jsonResponse['bio']);
+
     return p;
 
   }
 
-  void _logout() async {
-    globals.profilePhoto = null;
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.clear();
-    Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
-  }
 }
 
 
