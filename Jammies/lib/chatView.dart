@@ -13,6 +13,19 @@ class chatView extends StatefulWidget {
 }
 
 class _ChatView extends State<chatView>{
+    Future<List<String>> futureNames;
+
+    List<String> names;
+
+
+    @override
+    void initState() {
+        // TODO: implement initState
+        super.initState();
+
+        futureNames = _getMatches();
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -29,6 +42,28 @@ class _ChatView extends State<chatView>{
                         },
                     ),
                 ],
+            ),
+            body: Center(
+                child: FutureBuilder<List<String>>(
+                    future: futureNames,
+                    builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                            names = snapshot.data;
+                            return ListView.separated(
+                                itemCount: names.length,
+                                itemBuilder: (context, index) {
+                                    return ListTile(
+                                        title: Text(names[index]),
+                                    );
+                                },
+                                separatorBuilder: (context, index) {
+                                    return Divider();
+                                },
+                            );
+                        }
+                        return Center(child: CircularProgressIndicator());
+                    }
+                )
             ),
             bottomNavigationBar: BottomNavigationBar(
                 items: const <BottomNavigationBarItem>[
@@ -77,4 +112,33 @@ class _ChatView extends State<chatView>{
             Navigator.pushNamedAndRemoveUntil(context, '/discover', (_) => false);
         }
     }
+
+    Future<List<String>> _getMatches() async {
+        final prefs = await SharedPreferences.getInstance();
+        String email = prefs.getString('email');
+        String password = prefs.getString('password');
+        List<String> matchedNames = new List<String>();
+
+        Map<String, String> header = {'email': email, 'password': password};
+        print(header);
+        final response = await http.get('http://jam.smpark.in/getMatches', headers: header,);
+
+        var idList = (jsonDecode(response.body) as List);
+
+        for (int i = 0; i < idList.length; i++) {
+            Map<String, String> header = {
+                'email': email,
+                'password': password,
+                'userid': idList[i].toString()
+            };
+            var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+
+            Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+            matchedNames.add(jsonResponse['name']);
+        }
+        print(matchedNames);
+        return matchedNames;
+
+    }
+
 }
