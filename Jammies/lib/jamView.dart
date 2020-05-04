@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'globals.dart';
+
 //reference for swipe cards https://mightytechno.com/flutter-tinder-swipe-cards/
 
 class ProfileCard {
@@ -41,7 +43,6 @@ class _JamView extends State<jamView>  {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     futureCards = populateProfileCards();
 
   }
@@ -53,7 +54,9 @@ class _JamView extends State<jamView>  {
           title: Text("Jam"),
           actions: <Widget>[
             IconButton(
-              icon: Image.asset('assets/icon/icon.png'),
+              icon: globals.profilePhoto == null
+                  ? Image.asset( "assets/icon/icon.png")
+                  : Image.file(globals.profilePhoto),
               iconSize: 50,
               onPressed: () {
                 Navigator.pushNamed(context, '/myProfileView');

@@ -3,8 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:async/async.dart';
+import 'package:path_provider/path_provider.dart';
+import 'globals.dart';
 
 class Profile {
   String bio = "";
@@ -61,7 +63,9 @@ class _MyProfileView extends State<myProfileView> {
                     backgroundImage: FileImage(File(profilePath)),
                       radius: 50,
                       backgroundColor: Colors.indigo,
-                      //backgroundImage: AssetImage(''),
+                      backgroundImage: globals.profilePhoto == null
+                        ? AssetImage( "assets/icon/icon.png")
+                        : FileImage(globals.profilePhoto),
                     ),
                   ),
                   Padding(
@@ -146,13 +150,12 @@ class _MyProfileView extends State<myProfileView> {
 
     Profile p = new Profile(jsonResponse['name'], jsonResponse['bio'], path);
 
-    print(jsonResponse['bio']);
-
     return p;
 
   }
 
   void _logout() async {
+    globals.profilePhoto = null;
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
