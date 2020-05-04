@@ -6,13 +6,21 @@ import hashlib
 from zipcode_distance import *
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/home/smparkin/uploads/'
+UPLOAD_FOLDER = '/home/smparkin/NiTheCodersSay/flaskServer/static/images'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 db = SQLAlchemy(app)
+
+class Matchings(db.Model):
+    matcherId = db.Column(db.Integer, primary_key=True)
+    matcheeId = db.Column(db.Integer, primary_key=True)
+
+    def __init__(self, matcher, matchee):
+        self.matcherId = matcher
+        self.matcheeId = matchee
 
 class Profiles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,6 +57,69 @@ class Users(db.Model):
     def __repr__(self):
         return '<User %r>' % self.id
 
+
+
+@app.route('/match', methods=["POST"])
+def match():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+    try:
+        matcher = data['matcher']
+        matchee = data['matchee']
+    except:
+        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+
+    match = Matchings.query.filter_by(matcherId=matcher).filter_by(matcheeId=matchee).first()
+    if match == None:
+        newMatch = Matchings(matcher, matchee)
+        db.session.add(newMatch)
+        db.session.commit()
+        return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
+    else:
+        return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
+
+
+@app.route('/getMatches', methods=["GET"])
+def getMatches():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    matchedWithUser = Matchings.query.filter_by(matcheeId=user.id).all()
+
+    matchList = []
+    for i in matchedWithUser:
+        userMatched = Matchings.query.filter_by(matcherId=user.id).filter_by(matcheeId=i.matcherId).first()
+        if userMatched != None:
+            matchList.append(i.matcherId)
+
+    return jsonify(matchList)
+
+
+@app.route('/', methods=["GET", "POST"])
+def home():
+    message = "Hello there"
+    return render_template('index.html', message=message)
+
+
 @app.route('/upload', methods=["POST"])
 def upload():
     email = request.headers['email']
@@ -59,9 +130,10 @@ def upload():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
+    user = Users.query.filter_by(email=email).first()
     try:
         image = request.files['file']
-        filename = secure_filename(email)
+        filename = secure_filename(str(user.id))
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return Response("{'status':'Saved image'}", status=200, mimetype='application/json')
     except:
@@ -78,8 +150,9 @@ def download():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
+    user = Users.query.filter_by(email=email).first()
     try:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(email))
+        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(str(user.id)))
         return send_file(filename, mimetype='image/jpg')
     except:
         return Response("{'error':'Unable to retrieve image'}", status=420, mimetype='application/json')
@@ -128,8 +201,10 @@ def login():
 
     valid = verify(email, password)
 
+    user = Users.query.filter_by(email=email).first()
+
     if (valid):
-        return Response("{'status':'Valid email and password'}", status=200, mimetype='application/json')
+        return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
     return Response("{'error':'Not valid email or password'}", status=401, mimetype='application/json')
 
 
@@ -276,7 +351,3 @@ def getNearby():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-
-
-def helloPeril():
-    return True

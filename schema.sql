@@ -1,16 +1,10 @@
-DROP TABLE IF EXISTS `soundcloud_keys`;
-
 CREATE TABLE IF NOT EXISTS `soundcloud_keys`(
   `id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`));
-  
-DROP TABLE IF EXISTS `spotify_keys`;
 
 CREATE TABLE IF NOT EXISTS `spotify_keys`(
-  `id` INT NOT NULL AUTO_INCREMENT,  -- secret token (to be added later)
+  `id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`));
-
-DROP TABLE IF EXISTS `profiles`;
 
 CREATE TABLE IF NOT EXISTS `profiles`(
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -23,16 +17,21 @@ CREATE TABLE IF NOT EXISTS `profiles`(
   FOREIGN KEY (`spotify_key`) REFERENCES spotify_keys(`id`),
   FOREIGN KEY (`soundcloud_key`) REFERENCES soundcloud_keys(`id`));
 
-DROP TABLE IF EXISTS `users`;
-
 CREATE TABLE IF NOT EXISTS `users`(
   `id` INT NOT NULL AUTO_INCREMENT,
   `email` VARCHAR(30) NOT NULL,
   `username` VARCHAR(20) NOT NULL,
-  `password` VARCHAR(128) NOT NULL, -- SHA256
-  `zipcode` CHAR(5) NOT NULL, -- Just first 5 is enough
+  `password` VARCHAR(128) NOT NULL,
+  `zipcode` CHAR(5) NOT NULL,
   `dob` DATE NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id`) REFERENCES profiles(`id`));
-  
+
+CREATE TABLE IF NOT EXISTS `matchings`(
+  `matcherId` INT NOT NULL,
+  `matcheeId` INT NOT NULL,
+  PRIMARY KEY (`matcherId`, `matcheeId`),
+  FOREIGN KEY (`matcherId`) REFERENCES profiles(`id`),
+  FOREIGN KEY (`matcheeId`) REFERENCES profiles(`id`));
+

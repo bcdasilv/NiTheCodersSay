@@ -198,7 +198,7 @@ class _JamView extends State<jamView>  {
             color: Colors.lightBlue[50],
             shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Container(width: 300, height: 530, child: profileJamView(cards[i].name, cards[i].bio)),
+            child: Container(width: 300, height: 530, child: profileJamView(cards[i].name, cards[i].bio, cards[i].id)),
           ),
         )
       ),

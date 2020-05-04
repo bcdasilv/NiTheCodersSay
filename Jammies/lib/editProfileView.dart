@@ -43,7 +43,13 @@ class editProfileState extends State<editProfileView> {
     final path = directory.path;
     print(path);
 
-    print("uploading: ");
+    
+    // copy the file to a new path
+    File newFile = await file.copy('$path/profile.png');
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString('profile_image', newFile.path);
+
     if (file == null) {
       print("Null file");
       return;
