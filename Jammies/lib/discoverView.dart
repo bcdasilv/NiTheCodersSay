@@ -35,6 +35,11 @@ class _DiscoverView extends State<discoverView> {
   var client = http.Client();
 
   Future<List<Post>> futurePosts;
+
+  final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final bodyController = TextEditingController();
+
   //List<Post> posts;
 
   //List<Widget> postList = makePostList();
@@ -50,22 +55,6 @@ class _DiscoverView extends State<discoverView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Discover'), actions: <Widget>[
-        ButtonTheme(
-          minWidth: 75.0,
-          height: 0.0,
-          child: RaisedButton(
-            onPressed: () {},
-            color: Colors.teal[200],
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Text(
-              'Post',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
         IconButton(
           icon: globals.profilePhoto == null
               ? Image.asset('assets/icon/icon.png')
@@ -78,6 +67,105 @@ class _DiscoverView extends State<discoverView> {
       ]),
       body: Center(
         child: ListView(children: makePostList()),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Stack(
+                  overflow: Overflow.visible,
+                  children: <Widget>[
+                    Positioned(
+                      right: -40.0,
+                      top: -40.0,
+                      child: InkResponse(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: CircleAvatar(
+                          child: Icon(Icons.close),
+                          backgroundColor: Colors.red,
+                        )
+                      )
+                    ),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text( "Make a Post",
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                            )
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.title),
+                                hintText: 'Title',
+                                labelText: 'Title',
+                              ),
+                              onSaved: (String value) {
+                                // This optional block of code can be used to run
+                                // code when the user saves the form.
+                              },
+                              validator: (String value) {
+                                return value.isEmpty ? 'Post must have a title' : null;
+                              },
+                              textCapitalization: TextCapitalization.sentences,
+                              maxLines: null,
+                              controller: titleController,
+                            )
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.text_fields),
+                                hintText: 'Body',
+                                labelText: 'Body',
+                              ),
+                              onSaved: (String value) {
+                                // This optional block of code can be used to run
+                                // code when the user saves the form.
+                              },
+                              validator: (String value) {
+                                return null;
+                              },
+                              textCapitalization: TextCapitalization.sentences,
+                              minLines: 2,
+                              maxLines: null,
+                              controller: bodyController,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: RaisedButton(
+                              child: Text("Submit"),
+                              onPressed: () {
+                                if (_formKey.currentState.validate()) {
+                                  _formKey.currentState.save();
+                                  post();
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                            )
+                          )
+                        ]
+                      )
+                    )
+                  ]
+                )
+              );
+            }
+          );
+        },
+        child: Icon(Icons.mail),
+        backgroundColor: Colors.deepPurple,
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -126,6 +214,27 @@ class _DiscoverView extends State<discoverView> {
     } else if (index == 2) {
       Navigator.pushNamedAndRemoveUntil(context, '/discover', (_) => false);
     }
+  }
+
+  void post() async {
+    print("Title: " + titleController.text);
+    print("Body: " + bodyController.text);
+
+    final prefs = await SharedPreferences.getInstance();
+
+    String email = prefs.getString('email');
+    String password = prefs.getString('password');
+
+    var uri = Uri.parse('http://jam.smpark.in/makePost');
+
+    Map<String, String> header = {'email': email, 'password': password};
+
+
+
+    final response = await http.post('http://jam.smpark.in/login',
+        headers: header,
+        body: { 'title': titleController.text, 'body': bodyController.text } );
+    print(response.statusCode);
   }
 
   List<Post> populatePosts() {
