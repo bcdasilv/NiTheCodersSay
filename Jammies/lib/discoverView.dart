@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,7 @@ class Post {
       this.authorid,
       this.time,
       this.content});
+
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
