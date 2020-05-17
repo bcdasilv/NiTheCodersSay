@@ -16,7 +16,6 @@ class Post {
   Post(
       {this.postid,
       this.title,
-      this.author,
       this.authorid,
       this.time,
       this.content});
@@ -28,7 +27,7 @@ class Post {
         title: json['title'],
         author: json['author'],
         authorid: json['authorid'],
-        time: json['time'],
+        time: json['time'].split(' ')[0],
         content: json['content']);
   }
 }
@@ -150,21 +149,37 @@ class _DiscoverView extends State<discoverView> {
               "authorid":2,
               "time":"2012-04-23 18:25:43",
               "content":"Here is some moresample text for the post with multiple lines so you see more when expanding"         
-          }      
+          },  
+          {
+              "postid":3,
+              "title":"Title 2",
+              "author":"A person 2",
+              "authorid":2,
+              "time":"2012-04-23 18:25:43",
+              "content":"Here is some moresample text for the post with multiple lines so you see more when expanding"         
+          },    
+          {
+              "postid":4,
+              "title":"Title 2",
+              "author":"A person 2",
+              "authorid":2,
+              "time":"2012-04-23 18:25:43",
+              "content":"Here is some moresample text for the post with multiple lines so you see more when expanding"         
+          }        
       ]
     }
 """;
 
-    //final response = await http.get('http://jam.smpark.in/getPosts');
+    //final response = await http.get('http://jam.smpark.in/getPost');
     //var postList = (jsonDecode(response.body) as List);
 //
     Map<String, dynamic> postListResponse = json.decode(response);
     var postList =
         postListResponse['posts'].map((value) => Post.fromJson(value)).toList();
-    print(postList);
+    //print(postList);
     for (var i = 0; i < postList.length; i++) {
       var currPost = postList[i];
-      print(currPost);
+      //print(currPost);
       posts.add(currPost);
     }
 
@@ -177,13 +192,29 @@ class _DiscoverView extends State<discoverView> {
 
     for (var i = 0; i < posts.length; i++) {
       var currPost = posts[i];
+
       postList.add(
         Card(
-          child: ExpandableNotifier(
+          child: Column(
+            children: <Widget>[
+          Container(
+            height: 100,
+            width: 150,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/icon/icon.png'),
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+          ExpandableNotifier(
             child: ScrollOnExpand(
               child: ExpandablePanel(
-                header: Text(
-                  currPost.title,
+                header:
+                Text(
+                  currPost.title+'\n'+ currPost.author +
+                      '\n' +
+                      currPost.time,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -193,14 +224,20 @@ class _DiscoverView extends State<discoverView> {
                   softWrap: true,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+
                 ),
                 expanded: Text(
                   currPost.content,
                   softWrap: true,
                 ),
+
               ),
             ),
           ),
+
+          ],
+        ),
+
         ),
       );
     }
