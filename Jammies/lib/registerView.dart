@@ -11,6 +11,9 @@ import 'discoverView.dart';
 class registerField extends StatefulWidget {
   @override
   registerFieldState createState() => registerFieldState();
+  registerField({Key key, this.title}) : super(key: key);
+
+  final String title;
 }
 //postLogin
 /*
@@ -181,6 +184,7 @@ class registerFieldState extends State<registerField> {
                         ),
                       ),
                     ),
+                    /*
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: DateTimePickerFormField(
@@ -198,10 +202,14 @@ class registerFieldState extends State<registerField> {
                         },
                       ),
                     ),
+                    */
+
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: RaisedButton(
-                        child: Text("Register new account"),
+                          key: Key('register'),
+                        child: Text("Register new account",
+                            key: Key('registerText')),
                         onPressed: _submitForm,
                       ),
                     ),
