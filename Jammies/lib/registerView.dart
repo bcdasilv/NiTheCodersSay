@@ -239,7 +239,10 @@ class registerFieldState extends State<registerField> {
                           _selectDate(context);
                         },
                         color: Colors.teal[300],
-                        child: Text('Select Date'),
+                        child: Text('Select Date',
+                          style: TextStyle(
+                          color: Colors.white,
+                        ),),
                       ),
                     ),
                     Padding(
