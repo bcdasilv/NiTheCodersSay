@@ -12,47 +12,46 @@ class discoverView extends StatefulWidget {
 }
 
 class Post {
-  var postid, title, author, authorid, time, content;
+  var postid, title, authorid, time, content, author;
   Post(
       {this.postid,
       this.title,
-      this.author,
       this.authorid,
       this.time,
-      this.content});
+      this.content,
+      this.author});
 
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
         postid: json['postid'],
         title: json['title'],
-        author: json['author'],
         authorid: json['authorid'],
-        time: json['time'],
-        content: json['content']);
+        time: json['time'].split(' ')[0],
+        content: json['content'],
+        author: 'author');
   }
 }
 
 class _DiscoverView extends State<discoverView> {
   var client = http.Client();
 
+  List<Widget> postList;
   Future<List<Post>> futurePosts;
 
   final _formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final bodyController = TextEditingController();
 
-  //List<Post> posts;
+  List<Post> posts;
 
-  //List<Widget> postList = makePostList();
-/*
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     futurePosts = populatePosts();
   }
-*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +67,17 @@ class _DiscoverView extends State<discoverView> {
         ),
       ]),
       body: Center(
-        child: ListView(children: makePostList()),
+        child: FutureBuilder<List<Post>>(
+      future: futurePosts,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            posts = snapshot.data;
+            postList = makePostList();
+            return ListView(children: postList);
+          }
+          return CircularProgressIndicator();
+        },
+      ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -241,41 +250,30 @@ class _DiscoverView extends State<discoverView> {
     print(response.body);
   }
 
-  List<Post> populatePosts() {
-    List<Post> posts = [];
-    //example json placeholder
-    var response = """
-        {"posts":[
-           {
-              "postid":1,
-              "title":"Title",
-              "author":"A person",
-              "authorid":1,
-              "time":"2012-04-23 18:25:43",
-              "content":"Here is some sample text for the post with multiple lines so you see more when expanding"
-           },
-           {
-              "postid":2,
-              "title":"Title 2",
-              "author":"A person 2",
-              "authorid":2,
-              "time":"2012-04-23 18:25:43",
-              "content":"Here is some moresample text for the post with multiple lines so you see more when expanding"         
-          }      
-      ]
-    }
-""";
+  Future<List<Post>> populatePosts() async{
+    final prefs = await SharedPreferences.getInstance();
 
-    //final response = await http.get('http://jam.smpark.in/getPosts');
-    //var postList = (jsonDecode(response.body) as List);
-//
-    Map<String, dynamic> postListResponse = json.decode(response);
-    var postList =
-        postListResponse['posts'].map((value) => Post.fromJson(value)).toList();
-    print(postList);
+    String email = prefs.getString('email');
+    String password = prefs.getString('password');
+    Map<String, String> header = {'email': email, 'password': password};
+    List<Post> posts = [];
+
+    final response = await http.get('http://jam.smpark.in/getPost', headers: header);
+    Map<String, dynamic> postListResponse = json.decode(response.body);
+    var postList = postListResponse['posts'].map((value) => Post.fromJson(value)).toList();
+
     for (var i = 0; i < postList.length; i++) {
-      var currPost = postList[i];
-      print(currPost);
+      Post currPost = postList[i];
+      Map<String, String> header = {
+        'email': email,
+        'password': password,
+        'userid': currPost.authorid.toString()
+      };
+      var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      currPost.author = jsonResponse['name'];
+
       posts.add(currPost);
     }
 
@@ -283,18 +281,33 @@ class _DiscoverView extends State<discoverView> {
   }
 
   List<Widget> makePostList() {
-    List<Post> posts = populatePosts();
     List<Widget> postList = List();
 
     for (var i = 0; i < posts.length; i++) {
       var currPost = posts[i];
+
       postList.add(
         Card(
-          child: ExpandableNotifier(
+          child: Column(
+            children: <Widget>[
+          Container(
+            height: 100,
+            width: 150,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage('http://jam.smpark.in/static/images/' + currPost.authorid.toString()),
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+          ExpandableNotifier(
             child: ScrollOnExpand(
               child: ExpandablePanel(
-                header: Text(
-                  currPost.title,
+                header:
+                Text(
+                  currPost.title+'\n'+ currPost.author +
+                      ', ' +
+                      currPost.time,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -304,14 +317,20 @@ class _DiscoverView extends State<discoverView> {
                   softWrap: true,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+
                 ),
                 expanded: Text(
                   currPost.content,
                   softWrap: true,
                 ),
+
               ),
             ),
           ),
+
+          ],
+        ),
+
         ),
       );
     }
