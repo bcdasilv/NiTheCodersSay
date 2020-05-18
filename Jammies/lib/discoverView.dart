@@ -295,11 +295,9 @@ class _DiscoverView extends State<discoverView> {
           Container(
             height: 100,
             width: 150,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage('http://jam.smpark.in/static/images/' + currPost.authorid.toString()),
-                fit: BoxFit.fill,
-              ),
+            child: FadeInImage(
+              image: NetworkImage('http://jam.smpark.in/static/images/' + currPost.authorid.toString()), placeholder: AssetImage("assets/icon/icon.png"),
+              fit: BoxFit.fill,
             ),
           ),
           ExpandableNotifier(
