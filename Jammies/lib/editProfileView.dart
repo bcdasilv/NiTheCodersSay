@@ -115,7 +115,7 @@ class editProfileState extends State<editProfileView> {
                   ),
                   globals.profilePhoto == null
                       ? Text('No Image Selected')
-                      : Text('This is your choice') // This doesn't work
+                      : Text('This is your choice')
                 ],
               ),
               Align(

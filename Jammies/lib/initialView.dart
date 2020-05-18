@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'globals.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
 
 class initialView extends StatefulWidget {
