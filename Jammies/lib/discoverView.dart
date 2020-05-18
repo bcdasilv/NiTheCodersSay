@@ -245,7 +245,7 @@ class _DiscoverView extends State<discoverView> {
 
 
 
-    final response = await http.post('http://jam.smpark.in/makePost ',
+    final response = await http.post('http://jam.smpark.in/makePost',
         headers: header,
         body: { 'title': titleController.text, 'body': bodyController.text } );
     print(response.statusCode);
@@ -297,7 +297,7 @@ class _DiscoverView extends State<discoverView> {
             width: 150,
             child: FadeInImage(
               image: NetworkImage('http://jam.smpark.in/static/images/' + currPost.authorid.toString()), placeholder: AssetImage("assets/icon/icon.png"),
-              fit: BoxFit.fill,
+              fit: BoxFit.scaleDown,
             ),
           ),
           ExpandableNotifier(
