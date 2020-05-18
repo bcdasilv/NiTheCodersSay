@@ -5,4 +5,5 @@ class globals {
   static String bio = '';
   static String about = '';
   static String name = '';
+  static String id = '';
 }

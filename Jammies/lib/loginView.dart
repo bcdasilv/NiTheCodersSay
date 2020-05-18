@@ -150,7 +150,8 @@ class loginFieldState extends State<loginField> {
       final response = await http.post('http://jam.smpark.in/login', body: { 'email': emailController.text, 'password': "$hash" } );
 
       if(response.statusCode == 200) {
-        _getPhoto(json.decode(response.body.replaceAll("'", '"'))['userid']);
+        globals.id = await json.decode(response.body.replaceAll("'", '"'))['userid'];
+        _getPhoto(globals.id);
         _saveCredentials();
         Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
       }

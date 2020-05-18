@@ -26,7 +26,8 @@ class initialViewState extends State<initialView> {
         http.post('http://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
 
           if(response.statusCode == 200) {
-            _getPhoto(json.decode(response.body.replaceAll("'", '"'))['userid']);
+            globals.id = json.decode(response.body.replaceAll("'", '"'))['userid'];
+            _getPhoto(globals.id);
             Navigator.pushNamedAndRemoveUntil(context, '/jam', (_) => false);
           }
 

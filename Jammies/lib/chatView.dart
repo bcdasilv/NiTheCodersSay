@@ -34,7 +34,9 @@ class _ChatView extends State<chatView>{
                 actions: <Widget>[
                     IconButton(
                         icon: globals.profilePhoto == null
-                            ? Image.asset( "assets/icon/icon.png")
+                            ? FadeInImage(
+                                image: NetworkImage('http://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
+                            )
                             : Image.file(globals.profilePhoto),
                         iconSize: 50,
                         onPressed: () {
