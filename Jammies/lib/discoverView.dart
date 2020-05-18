@@ -107,13 +107,13 @@ class _DiscoverView extends State<discoverView> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(4.0),
                             child: Text( "Make a Post",
                               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
                             )
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(4.0),
                             child: TextFormField(
                               decoration: const InputDecoration(
                                 icon: Icon(Icons.title),
@@ -133,7 +133,7 @@ class _DiscoverView extends State<discoverView> {
                             )
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(4.0),
                             child: TextFormField(
                               decoration: const InputDecoration(
                                 icon: Icon(Icons.text_fields),
@@ -148,7 +148,6 @@ class _DiscoverView extends State<discoverView> {
                                 return null;
                               },
                               textCapitalization: TextCapitalization.sentences,
-                              minLines: 2,
                               maxLines: null,
                               controller: bodyController,
                             ),
@@ -157,6 +156,8 @@ class _DiscoverView extends State<discoverView> {
                             padding: const EdgeInsets.all(8.0),
                             child: RaisedButton(
                               child: Text("Submit"),
+                              color: Colors.deepPurple,
+                              textColor: Colors.white,
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
@@ -242,10 +243,11 @@ class _DiscoverView extends State<discoverView> {
 
 
 
-    final response = await http.post('http://jam.smpark.in/login',
+    final response = await http.post('http://jam.smpark.in/makePost ',
         headers: header,
         body: { 'title': titleController.text, 'body': bodyController.text } );
     print(response.statusCode);
+    print(response.body);
   }
 
   Future<List<Post>> populatePosts() async{

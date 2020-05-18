@@ -232,9 +232,9 @@ def updateProfile():
         data = request.form
 
     try:
-        about_me = data['about_me']
         bio = data['bio']
         pic_path = data['pic_path']
+        about_me = data['about_me']
         #spotify_key = data['spotify_key']
         #soundcloud_key = data['soundcloud_key']
     except:
@@ -284,17 +284,17 @@ def getProfile():
         return Response("{'error':'No such profile'}", status=422, mimetype='application/json')
 
     name = user.name
-    #about_me = profile.about_me
+    about_me = profile.about_me
     bio = profile.bio
-    return jsonify(name=name, bio=bio)
+    return jsonify(name=name, about_me=about_me, bio=bio)
 
-def distance(zip1, zip2):
-    z1 = select_zipcode(zip1)
-    z2 = select_zipcode(zip2)
-    if not (z1) or not (z2):
-        return None
-    return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
-  
+    def distance(zip1, zip2):
+        z1 = select_zipcode(zip1)
+        z2 = select_zipcode(zip2)
+        if not (z1) or not (z2):
+            return None
+        return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+
 @app.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
@@ -337,8 +337,8 @@ def getNearby():
         temp = []
         for person in otherZipcode:
             #Stephen's distance function goes below with args: user.zipcode and person.zipcode
-            dist = distance(userZipcode, person.zipcode)             
-            if dist != None:                 
+            dist = distance(userZipcode, person.zipcode)
+            if dist != None:
                 temp.append((person.id, dist))
 
         #Sort based on distance and add to result list
