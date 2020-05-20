@@ -34,4 +34,13 @@ CREATE TABLE IF NOT EXISTS `matchings`(
   PRIMARY KEY (`matcherId`, `matcheeId`),
   FOREIGN KEY (`matcherId`) REFERENCES profiles(`id`),
   FOREIGN KEY (`matcheeId`) REFERENCES profiles(`id`));
-
+  
+CREATE TABLE IF NOT EXISTS `posts`(
+  `postId` INT NOT NULL AUTO_INCREMENT,
+  `profileId` INT NOT NULL,
+  `postDateTime` DATETIME NOT NULL,
+  `postTitle` CHAR(50) NOT NULL,
+  `postBody` TEXT,
+  PRIMARY KEY (`postId`),
+  FOREIGN KEY (`profileId`) REFERENCES profiles(`id`))
+;
