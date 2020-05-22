@@ -151,6 +151,7 @@ def makePost():
     db.session.commit()
     return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
 
+
 @app.route('/getPost', methods=["GET"])
 def getPost():
     email = request.headers['email']
