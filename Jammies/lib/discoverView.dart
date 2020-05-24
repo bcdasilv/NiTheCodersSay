@@ -36,21 +36,6 @@ class Post {
 class _DiscoverView extends State<discoverView> {
   var client = http.Client();
 
-  List<Widget> postList;
-  Future<List<Post>> futurePosts;
-
-  final _formKey = GlobalKey<FormState>();
-  final titleController = TextEditingController();
-  final bodyController = TextEditingController();
-
-  List<Post> posts;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    futurePosts = populatePosts();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -284,10 +269,8 @@ class _DiscoverView extends State<discoverView> {
 
   List<Widget> makePostList() {
     List<Widget> postList = List();
-
     for (var i = 0; i < posts.length; i++) {
       var currPost = posts[i];
-
       postList.add(
         Card(
           child: Column(
@@ -317,13 +300,11 @@ class _DiscoverView extends State<discoverView> {
                   softWrap: true,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-
                 ),
                 expanded: Text(
                   currPost.content,
                   softWrap: true,
                 ),
-
               ),
             ),
           ),
@@ -334,7 +315,6 @@ class _DiscoverView extends State<discoverView> {
         ),
       );
     }
-
     return postList;
   }
 }

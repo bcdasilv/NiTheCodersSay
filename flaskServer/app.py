@@ -166,19 +166,21 @@ def getPost():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
-    jsonResponse = "{ 'posts': [ "
+
+    jsonResponse = '{ "posts": [ '
     postList = list(reversed(Posts.query.all()))
     for i in range(startid, startid+9):
         if i == len(postList):
             listJson = list(jsonResponse)
+            print(listJson)
             listJson[-2] = ''
             jsonResponse = "".join(listJson)
             break
-        jsonResponse += "{ 'postid': '" + str(postList[i].postId) + "', 'title': '" + postList[i].postTitle + "', 'authorid': '" + str(postList[i].profileId) + "', 'time': '" + str(postList[i].postDateTime) + "', 'content': '" + postList[i].postBody + "' }"
-        if i != startid+9:
-            jsonResponse += ", "
-    jsonResponse += "] }"
-    return jsonify(jsonResponse)
+        jsonResponse += '{ "postid": "' + str(postList[i].postId) + '", "title": "' + postList[i].postTitle + '", "authorid": "' + str(postList[i].profileId) + '", "time": "' + str(postList[i].postDateTime) + '", "content": "' + postList[i].postBody + '" }'
+        if i != startid+8:
+            jsonResponse += ', '
+    jsonResponse += '] }'
+    return Response(jsonResponse, status=200, mimetype='application/json')
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -239,7 +241,7 @@ def register():
         dob = data['dob']
         name = data['name']
     except:
-        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+        return Response("{'error':'not all data provided'}", status=400, mimetype='application/json')
 
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
@@ -251,7 +253,8 @@ def register():
     db.session.commit()
     db.session.add(newuser)
     db.session.commit()
-    return Response("{'status':'User added to db'}", status=200, mimetype='application/json')
+    user = Users.query.filter_by(email=email).first()
+    return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
 
 
 @app.route('/login', methods=["POST"])
@@ -417,4 +420,4 @@ def getNearby():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)
