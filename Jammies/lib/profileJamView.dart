@@ -32,7 +32,7 @@ class profileJamView extends StatelessWidget {
                       width: 190.0,
                       height: 190.0,
                       child: FadeInImage(
-                          image: NetworkImage('http://jam.smpark.in/static/images/' + id.toString()), placeholder: AssetImage("assets/icon/icon.png")
+                          image: NetworkImage('https://jam.smpark.in/static/images/' + id.toString()), placeholder: AssetImage("assets/icon/icon.png")
                       ),
                   ),
               )

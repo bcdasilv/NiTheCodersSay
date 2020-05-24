@@ -51,7 +51,7 @@ class editProfileState extends State<editProfileView> {
     var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
     var length = await file.length();
 
-    var uri = Uri.parse('http://jam.smpark.in/upload');
+    var uri = Uri.parse('https://jam.smpark.in/upload');
 
     var request = new http.MultipartRequest("POST", uri);
 
@@ -196,7 +196,7 @@ class editProfileState extends State<editProfileView> {
     String email = prefs.getString('email');
     String password = prefs.getString('password');
 
-    final response = await http.post('http://jam.smpark.in/updateProfile', headers: { 'email': email, 'password': password },
+    final response = await http.post('https://jam.smpark.in/updateProfile', headers: { 'email': email, 'password': password },
         body: { 'bio': bioController.text, 'about_me': aboutController.text, 'pic_path': "" } );
 
     print(response.body + " " + response.statusCode.toString());
