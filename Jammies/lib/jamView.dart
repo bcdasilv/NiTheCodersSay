@@ -237,8 +237,7 @@ class _JamView extends State<jamView>  {
 
     Map<String, String> header = {'email': email, 'password': password};
 
-
-    final response = await http.post('http://jam.smpark.in/match', headers: header, body: { 'matcher': globals.id, 'matchee': id.toString() } );
+    final response = await http.post('https://jam.smpark.in/match', headers: header, body: { 'matcher': globals.id, 'matchee': id.toString() } );
     if(response.statusCode == 800) {
       return   Alert(context: context,
         type: AlertType.error,
