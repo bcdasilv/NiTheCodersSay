@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:async/async.dart';
-import 'package:path_provider/path_provider.dart';
 import 'globals.dart';
 
 class Profile {
   String bio = "";
   String name = "";
-  String profilePath = "";
-  Profile(this.name, this.bio, this.profilePath);
+  String about = "";
+  Profile(this.name, this.bio, this.about);
 }
 
 class myProfileView extends StatefulWidget {
@@ -24,18 +21,10 @@ class _MyProfileView extends State<myProfileView> {
 
   Future<Profile> profile;
 
-  var name = "";
-  var bio = "";
-  var profilePath = "";
-
   var client = http.Client();
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var width = screenSize.width;
-    var height = screenSize.height;
-
     profile = _getProfileInfo();
 
     return Scaffold(
@@ -48,75 +37,99 @@ class _MyProfileView extends State<myProfileView> {
           future: profile,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              name = snapshot.data.name;
+              globals.name = snapshot.data.name;
               if (snapshot.data.bio != null) {
-                bio = snapshot.data.bio;
+                globals.bio = snapshot.data.bio;
               }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0),
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.indigo,
-                      backgroundImage: globals.profilePhoto == null
-                        ? AssetImage( "assets/icon/icon.png")
-                        : FileImage(globals.profilePhoto),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Text(
-                        name,
-                        style: TextStyle(fontWeight: FontWeight.bold)
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                        "Bio\n",
-                        style: TextStyle(fontWeight: FontWeight.bold)
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      bio,
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: RaisedButton(
-                      color: Colors.indigo,
-                      child: Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: Colors.white,
+              if (snapshot.data.about != null) {
+                globals.about = snapshot.data.about;
+              }
+              return Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.indigo,
+                          backgroundImage: globals.profilePhoto == null
+                            ? AssetImage( "assets/icon/icon.png")
+                            : FileImage(globals.profilePhoto),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/editProfileView');
-                      },
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: RaisedButton(
-                      color: Colors.teal,
-                      child: Text(
-                        'Log Out',
-                        style: TextStyle(
-                          color: Colors.white,
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
+                        child: Text(
+                            globals.name,
+                            style: TextStyle(fontWeight: FontWeight.bold)
                         ),
                       ),
-                      onPressed: () {
-                        _logout();
-                      },
-                    ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                            "About Me\n",
+                            style: TextStyle(fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          globals.about,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                            "Bio\n",
+                            style: TextStyle(fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          globals.bio,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: RaisedButton(
+                          color: Colors.indigo,
+                          child: Text(
+                            'Edit',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/editProfileView').then((value) {
+                              setState(() {
+                                globals.bio = globals.bio;
+                                globals.about = globals.about;
+                              });
+                            });;
+                          },
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: RaisedButton(
+                          color: Colors.teal,
+                          child: Text(
+                            'Log Out',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          onPressed: () {
+                            _logout();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
               );
             }
             return Center(child: CircularProgressIndicator());
@@ -133,20 +146,14 @@ class _MyProfileView extends State<myProfileView> {
 
     Map<String, String> header = {'email': email, 'password': password };
 
+    print('sending get profile request');
     var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
 
     print(response.body);
 
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-    String path = prefs.get('profile_image');
-
-    if(path == null) {
-      print("Path is null");
-      path = "";
-    }
-
-    Profile p = new Profile(jsonResponse['name'], jsonResponse['bio'], path);
+    Profile p = new Profile(jsonResponse['name'], jsonResponse['bio'], jsonResponse['about_me']);
 
     return p;
 
@@ -154,6 +161,9 @@ class _MyProfileView extends State<myProfileView> {
 
   void _logout() async {
     globals.profilePhoto = null;
+    globals.bio = '';
+    globals.name= '';
+    globals.about= '';
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);

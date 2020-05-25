@@ -5,6 +5,7 @@ import os
 import hashlib
 from zipcode_distance import *
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 UPLOAD_FOLDER = '/home/smparkin/NiTheCodersSay/flaskServer/static/images'
 
@@ -36,6 +37,13 @@ class Profiles(db.Model):
         self.pic_path = None
         self.spotify_key = None
         self.soundcloud_key = None
+
+class Posts(db.Model):     
+    postId = db.Column(db.Integer, primary_key=True)     
+    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)     
+    postDateTime = db.Column(db.DateTime, nullable=False)     
+    postTitle = db.Column(db.String(50), nullable=False)  
+    postBody = db.Column(db.Text, nullable=True)
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -114,6 +122,67 @@ def getMatches():
     return jsonify(matchList)
 
 
+@app.route('/makePost', methods=["POST"])
+def makePost():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+    try:
+        postTitle = data['title']
+        postBody = data['body']
+    except:
+        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    newPost = Posts(profileId=user.id, postDateTime=datetime.now(), postTitle=postTitle, postBody=postBody)
+    db.session.add(newPost)
+    db.session.commit()
+    return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
+
+
+@app.route('/getPost', methods=["GET"])
+def getPost():
+    email = request.headers['email']
+    password = request.headers['password']
+    try:
+        startid = request.headers['startid']
+    except:
+        startid = 0
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+
+    jsonResponse = '{ "posts": [ '
+    postList = list(reversed(Posts.query.all()))
+    for i in range(startid, startid+9):
+        if i == len(postList):
+            listJson = list(jsonResponse)
+            print(listJson)
+            listJson[-2] = ''
+            jsonResponse = "".join(listJson)
+            break
+        jsonResponse += '{ "postid": "' + str(postList[i].postId) + '", "title": "' + postList[i].postTitle + '", "authorid": "' + str(postList[i].profileId) + '", "time": "' + str(postList[i].postDateTime) + '", "content": "' + postList[i].postBody + '" }'
+        if i != startid+8:
+            jsonResponse += ', '
+    jsonResponse += '] }'
+    return Response(jsonResponse, status=200, mimetype='application/json')
+
+
 @app.route('/', methods=["GET", "POST"])
 def home():
     message = "Hello there"
@@ -172,7 +241,7 @@ def register():
         dob = data['dob']
         name = data['name']
     except:
-        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+        return Response("{'error':'not all data provided'}", status=400, mimetype='application/json')
 
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
@@ -184,7 +253,8 @@ def register():
     db.session.commit()
     db.session.add(newuser)
     db.session.commit()
-    return Response("{'status':'User added to db'}", status=200, mimetype='application/json')
+    user = Users.query.filter_by(email=email).first()
+    return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
 
 
 @app.route('/login', methods=["POST"])
@@ -232,9 +302,9 @@ def updateProfile():
         data = request.form
 
     try:
-        about_me = data['about_me']
         bio = data['bio']
         pic_path = data['pic_path']
+        about_me = data['about_me']
         #spotify_key = data['spotify_key']
         #soundcloud_key = data['soundcloud_key']
     except:
@@ -284,17 +354,17 @@ def getProfile():
         return Response("{'error':'No such profile'}", status=422, mimetype='application/json')
 
     name = user.name
-    #about_me = profile.about_me
+    about_me = profile.about_me
     bio = profile.bio
-    return jsonify(name=name, bio=bio)
+    return jsonify(name=name, about_me=about_me, bio=bio)
 
-def distance(zip1, zip2):
-    z1 = select_zipcode(zip1)
-    z2 = select_zipcode(zip2)
-    if not (z1) or not (z2):
-        return None
-    return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
-  
+    def distance(zip1, zip2):
+        z1 = select_zipcode(zip1)
+        z2 = select_zipcode(zip2)
+        if not (z1) or not (z2):
+            return None
+        return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+
 @app.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
@@ -337,8 +407,8 @@ def getNearby():
         temp = []
         for person in otherZipcode:
             #Stephen's distance function goes below with args: user.zipcode and person.zipcode
-            dist = distance(userZipcode, person.zipcode)             
-            if dist != None:                 
+            dist = distance(userZipcode, person.zipcode)
+            if dist != None:
                 temp.append((person.id, dist))
 
         #Sort based on distance and add to result list
@@ -350,4 +420,4 @@ def getNearby():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)
