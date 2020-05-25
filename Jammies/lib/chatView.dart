@@ -35,7 +35,7 @@ class _ChatView extends State<chatView>{
                     IconButton(
                         icon: globals.profilePhoto == null
                             ? FadeInImage(
-                                image: NetworkImage('http://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
+                                image: NetworkImage('https://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
                             )
                             : Image.file(globals.profilePhoto),
                         iconSize: 50,
@@ -123,7 +123,7 @@ class _ChatView extends State<chatView>{
 
         Map<String, String> header = {'email': email, 'password': password};
         print(header);
-        final response = await http.get('http://jam.smpark.in/getMatches', headers: header,);
+        final response = await http.get('https://jam.smpark.in/getMatches', headers: header,);
 
         var idList = (jsonDecode(response.body) as List);
 
@@ -133,7 +133,7 @@ class _ChatView extends State<chatView>{
                 'password': password,
                 'userid': idList[i].toString()
             };
-            var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+            var response = await http.get('https://jam.smpark.in/getProfile', headers: header);
 
             Map<String, dynamic> jsonResponse = jsonDecode(response.body);
             matchedNames.add(jsonResponse['name']);
