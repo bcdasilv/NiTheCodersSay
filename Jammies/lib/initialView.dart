@@ -22,7 +22,7 @@ class initialViewState extends State<initialView> {
       String email = result.getString('email');
       String password = result.getString('password');
       if (email != null && password != null) {
-        http.post('http://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
+        http.post(globals.server + '/login', body: { 'email': email, 'password': password } ).then((response) {
 
           if(response.statusCode == 200) {
             globals.id = json.decode(response.body.replaceAll("'", '"'))['userid'];
@@ -36,7 +36,7 @@ class initialViewState extends State<initialView> {
   }
 
   void _getPhoto(String id) async {
-    http.Response response = await http.get('http://jam.smpark.in/static/images/' + id);
+    http.Response response = await http.get(globals.server + '/static/images/' + id);
     var filePath = await ImagePickerSaver.saveFile(
         fileData: response.bodyBytes);
     if (filePath.length == 0) {
