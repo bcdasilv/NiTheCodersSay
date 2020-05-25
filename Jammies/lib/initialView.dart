@@ -23,7 +23,7 @@ class initialViewState extends State<initialView> {
       String email = result.getString('email');
       String password = result.getString('password');
       if (email != null && password != null) {
-        http.post('https://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
+        http.post(globals.server + '/login', body: { 'email': email, 'password': password } ).then((response) {
 
           if(response.statusCode == 200) {
             globals.id = json.decode(response.body.replaceAll("'", '"'))['userid'];
@@ -37,7 +37,7 @@ class initialViewState extends State<initialView> {
   }
 
   void _getPhoto(String id) async {
-    var response = await http.get('https://jam.smpark.in/static/images/' + id);
+    var response = await http.get(globals.server + '/static/images/' + id);
     if (response.statusCode != 200) {
       return;
     }
