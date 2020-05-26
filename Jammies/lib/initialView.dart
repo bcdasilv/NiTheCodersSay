@@ -85,6 +85,7 @@ class initialViewState extends State<initialView> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
                 child: RaisedButton(
+                  key: Key('login'),
                   child: Text("Login"),
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');

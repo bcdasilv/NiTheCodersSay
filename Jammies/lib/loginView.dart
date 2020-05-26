@@ -75,6 +75,7 @@ class loginFieldState extends State<loginField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: TextFormField(
+                        key: Key('email'),
                         validator: (value) {
                           if(value.length == 0) {
                             return "Please enter an email";
@@ -90,6 +91,7 @@ class loginFieldState extends State<loginField> {
                       ),
                     ),
                     TextFormField(
+                      key: Key('password'),
                       validator: (value) {
                         if(value.length == 0) {
                           return "Please enter a password";
@@ -106,6 +108,7 @@ class loginFieldState extends State<loginField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                         child: RaisedButton(
+                          key: Key('loginButton'),
                           child: Text("Login"),
                           onPressed: _submitForm,
                         ),
