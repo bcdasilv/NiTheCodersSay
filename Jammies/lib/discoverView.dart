@@ -36,6 +36,21 @@ class Post {
 class _DiscoverView extends State<discoverView> {
   var client = http.Client();
 
+  List<Widget> postList;
+  Future<List<Post>> futurePosts;
+
+  final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final bodyController = TextEditingController();
+
+  List<Post> posts;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    futurePosts = populatePosts();
+  }
 
   @override
   Widget build(BuildContext context) {

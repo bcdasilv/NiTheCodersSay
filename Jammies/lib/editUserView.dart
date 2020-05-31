@@ -49,7 +49,7 @@ class _EditUserView extends State<editUserView> {
             IconButton(
               icon: globals.profilePhoto == null
                   ? FadeInImage(
-                  image: NetworkImage('https://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
+                  image: NetworkImage(globals.server + '/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
               )
                   : Image.file(globals.profilePhoto),
               iconSize: 50,
@@ -334,7 +334,7 @@ class _EditUserView extends State<editUserView> {
 
     Map<String, String> header = {'email': email, 'password': password };
 
-    var response = await http.get('http://159.89.150.59:80/getUser', headers: header);
+    var response = await http.get(globals.server + '/getUser', headers: header);
     print(response.body);
 
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
