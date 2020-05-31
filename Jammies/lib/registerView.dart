@@ -541,6 +541,7 @@ class photoPromptState extends State<photoPrompt> {
                 alignment: Alignment.bottomCenter,
                 child: RaisedButton(
                   child: Text("Submit",
+                    key: Key('submit'),
                     style: TextStyle(
                       color: Colors.white,
                     ),

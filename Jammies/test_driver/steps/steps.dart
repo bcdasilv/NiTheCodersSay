@@ -1,18 +1,17 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:gherkin/gherkin.dart';
-/*
-class CheckGivenWidgets extends GivenWithWorld<FlutterWorld> {
-  @override
-  Future<void> executeStep() async {
-// TODO: implement executeStep
-    //await FlutterDriverUtils.isPresent(find.byValueKey('loginButton'), world.driver);
-  }
-  @override
-// TODO: implement pattern
-  RegExp get pattern => RegExp(r"I have {string}");
-}
-*/
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:password/password.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
 class LoginValidation extends GivenWithWorld<FlutterWorld> {
 
   @override
@@ -20,13 +19,13 @@ class LoginValidation extends GivenWithWorld<FlutterWorld> {
     String input1 = "test123@test.com";
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('login'));
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('email'));
-    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('email'), input1);
+    await FlutterDriverUtils.enterText(
+        world.driver, find.byValueKey('email'), input1);
   }
 
   @override
   // TODO: implement pattern
   RegExp get pattern => RegExp(r"Given the user enters an invalid email");
-
 }
 
 class PasswordValidation extends AndWithWorld<FlutterWorld> {
@@ -61,8 +60,8 @@ class Nav_Validation extends ThenWithWorld<FlutterWorld> {
 
   @override
   Future<void> executeStep() async {
-    //await FlutterDriverUtils.waitForFlutter(world.driver);
-    //await FlutterDriverUtils.isPresent(find.byValueKey('nextScreenKey'), world.driver);
+    await FlutterDriverUtils.waitForFlutter(world.driver);
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('submit'));
   }
 
   @override
@@ -70,3 +69,53 @@ class Nav_Validation extends ThenWithWorld<FlutterWorld> {
   RegExp get pattern => RegExp(r"the user should see an error message");
 
 }
+
+class LoginSuccessValidation extends GivenWithWorld<FlutterWorld> {
+
+  @override
+  Future<void> executeStep() async {
+    String input1 = "smparkin@calpoly.edu";
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('login'));
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('email'));
+    await FlutterDriverUtils.enterText(
+        world.driver, find.byValueKey('email'), input1);
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"Given the user enters a valid email");
+}
+
+class PasswordSuccessValidation extends AndWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    final hash = sha512.convert(utf8.encode('test'));
+
+    String hashString = "$hash";
+
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('password'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('password'), hashString);
+
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user enters their password");
+
+}
+
+class Jam_Validation extends ThenWithWorld<FlutterWorld> {
+
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.waitForFlutter(world.driver);
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('submit'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user should land on the jam screen");
+
+}
+
+class

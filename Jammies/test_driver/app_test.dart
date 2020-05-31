@@ -25,7 +25,10 @@ Future<void> main() {
   final config = FlutterTestConfiguration()
     ..features = [Glob(r"test_driver/features/**.feature")]
     ..reporters = [ProgressReporter()]
-    ..stepDefinitions = [LoginValidation(), PasswordValidation(), LoginButton(), Nav_Validation()]
+    ..stepDefinitions = [LoginValidation(), PasswordValidation(), LoginButton(), Nav_Validation(),
+                          LoginSuccessValidation(), PasswordSuccessValidation(), Jam_Validation(),
+                          ]
+    ..reporters = [ProgressReporter(), TestRunSummaryReporter()]
     ..restartAppBetweenScenarios = true
     ..targetAppPath = "test_driver/app.dart"
     ..exitAfterTestRun = true;
