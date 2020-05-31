@@ -38,11 +38,11 @@ class Profiles(db.Model):
         self.spotify_key = None
         self.soundcloud_key = None
 
-class Posts(db.Model):     
-    postId = db.Column(db.Integer, primary_key=True)     
-    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)     
-    postDateTime = db.Column(db.DateTime, nullable=False)     
-    postTitle = db.Column(db.String(50), nullable=False)  
+class Posts(db.Model):
+    postId = db.Column(db.Integer, primary_key=True)
+    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    postDateTime = db.Column(db.DateTime, nullable=False)
+    postTitle = db.Column(db.String(50), nullable=False)
     postBody = db.Column(db.Text, nullable=True)
 
 class Users(db.Model):
