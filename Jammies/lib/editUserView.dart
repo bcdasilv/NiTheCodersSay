@@ -362,7 +362,7 @@ class _EditUserView extends State<editUserView> {
     final prefs = await SharedPreferences.getInstance();
     Map<String, String> header = {'email': globals.email, 'password': prefs.getString('password')};
 
-    final response = await http.post('http://159.89.150.59:8080/updateUser', headers: header, body:
+    final response = await http.post(globals.server + '/updateUser', headers: header, body:
     { 'email': emailController.text, 'name': nameController.text,
       'zipcode': zcController.text, 'dob': dateController.text, 'username': userNameController.text} );
 
