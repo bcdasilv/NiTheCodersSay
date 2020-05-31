@@ -358,7 +358,7 @@ def getProfile():
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
 
-    def distance(zip1, zip2):
+def distance(zip1, zip2):
         z1 = select_zipcode(zip1)
         z2 = select_zipcode(zip2)
         if not (z1) or not (z2):
