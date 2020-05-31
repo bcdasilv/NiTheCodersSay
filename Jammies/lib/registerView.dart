@@ -601,6 +601,7 @@ class photoPromptState extends State<photoPrompt> {
 
     var uri = Uri.parse(globals.server + '/upload');
 
+
     var request = new http.MultipartRequest("POST", uri);
 
     Map<String, String> header = {'email': email, 'password': password};

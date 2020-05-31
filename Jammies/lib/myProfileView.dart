@@ -147,6 +147,7 @@ class _MyProfileView extends State<myProfileView> {
     Map<String, String> header = {'email': email, 'password': password };
 
     print('sending get profile request');
+
     var response = await http.get(globals.server + '/getProfile', headers: header);
 
     print(response.body);

@@ -134,7 +134,6 @@ class _ChatView extends State<chatView>{
                 'userid': idList[i].toString()
             };
             var response = await http.get(globals.server + '/getProfile', headers: header);
-
             Map<String, dynamic> jsonResponse = jsonDecode(response.body);
             matchedNames.add(jsonResponse['name']);
         }

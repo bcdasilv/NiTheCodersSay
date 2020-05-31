@@ -7,6 +7,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'globals.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class loginField extends StatefulWidget {
@@ -176,12 +177,16 @@ class loginFieldState extends State<loginField> {
 
 
   void _getPhoto(String id) async {
-    http.Response response = await http.get(globals.server + '/static/images/' + id);
-    var filePath = await ImagePickerSaver.saveFile(
-        fileData: response.bodyBytes);
-    if (filePath.length == 0) {
+     http.Response response = await http.get(globals.server + '/static/images/' + id);
+    if (response.statusCode != 200) {
       return;
     }
-    globals.profilePhoto = File(filePath);
+    var documentDirectory = await getApplicationDocumentsDirectory();
+    var firstPath = documentDirectory.path + "/images";
+    var filePathAndName = documentDirectory.path + '/images/profile.jpg';
+    await Directory(firstPath).create(recursive: true);
+    File file2 = new File(filePathAndName);
+    file2.writeAsBytesSync(response.bodyBytes);
+    globals.profilePhoto = file2;
   }
 }
