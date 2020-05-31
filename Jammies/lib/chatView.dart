@@ -1,3 +1,4 @@
+import 'package:Jammies/profileChatView.dart';
 import 'package:Jammies/profileJamView.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -153,7 +154,13 @@ class _ChatView extends State<chatView> {
                       placeholder: AssetImage("assets/icon/icon.png")),
                   iconSize: 30,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/myProfileView');
+                    Navigator.of(context).push(MaterialPageRoute<Null>(
+                        builder: (BuildContext context) {
+                          return profileChatView(jsonResponse['name'], jsonResponse['bio'],
+                              idList[i],jsonResponse['about_me']);
+                        },
+                        fullscreenDialog: true
+                    ));
                   },
                 ),
                 Text(
