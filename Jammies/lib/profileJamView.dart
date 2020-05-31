@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'globals.dart';
 
 class profileJamView extends StatelessWidget {
 
@@ -32,7 +33,7 @@ class profileJamView extends StatelessWidget {
                       width: 190.0,
                       height: 190.0,
                       child: FadeInImage(
-                          image: NetworkImage('https://jam.smpark.in/static/images/' + id.toString()), placeholder: AssetImage("assets/icon/icon.png")
+                          image: NetworkImage(globals.server + '/static/images/' + id.toString()), placeholder: AssetImage("assets/icon/icon.png")
                       ),
                   ),
               )

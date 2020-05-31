@@ -6,4 +6,5 @@ class globals {
   static String about = '';
   static String name = '';
   static String id = '';
+  static String server = 'https://jam.smpark.in';
 }

@@ -148,7 +148,7 @@ class loginFieldState extends State<loginField> {
 
       hashString = "$hash";
 
-      final response = await http.post('https://jam.smpark.in/login', body: { 'email': emailController.text, 'password': "$hash" } );
+      final response = await http.post(globals.server + '/login', body: { 'email': emailController.text, 'password': "$hash" } );
 
       if(response.statusCode == 200) {
         globals.id = await json.decode(response.body.replaceAll("'", '"'))['userid'];
@@ -177,7 +177,7 @@ class loginFieldState extends State<loginField> {
 
 
   void _getPhoto(String id) async {
-    var response = await http.get('https://jam.smpark.in/static/images/' + id);
+     http.Response response = await http.get(globals.server + '/static/images/' + id);
     if (response.statusCode != 200) {
       return;
     }

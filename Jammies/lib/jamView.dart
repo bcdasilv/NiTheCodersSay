@@ -56,7 +56,7 @@ class _JamView extends State<jamView>  {
             IconButton(
               icon: globals.profilePhoto == null
                   ? FadeInImage(
-                      image: NetworkImage('http://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
+                      image: NetworkImage(globals.server + '/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
                     )
                   : Image.file(globals.profilePhoto),
               iconSize: 50,
@@ -141,7 +141,7 @@ class _JamView extends State<jamView>  {
 
     Map<String, String> header = {'email': email, 'password': password};
 
-    var response = await http.get('http://jam.smpark.in/getNearby', headers: header);
+    var response = await http.get(globals.server + '/getNearby', headers: header);
 
     var idList = (jsonDecode(response.body) as List);
 
@@ -154,7 +154,7 @@ class _JamView extends State<jamView>  {
     for(int i = 0; i < idList.length; i++) {
       Map<String, String> header = {'email': email, 'password': password, 'userid':idList[i].toString()};
 
-      var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+      var response = await http.get(globals.server + '/getProfile', headers: header);
 
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
@@ -237,7 +237,8 @@ class _JamView extends State<jamView>  {
 
     Map<String, String> header = {'email': email, 'password': password};
 
-    final response = await http.post('https://jam.smpark.in/match', headers: header, body: { 'matcher': globals.id, 'matchee': id.toString() } );
+
+    final response = await http.post(globals.server + '/match', headers: header, body: { 'matcher': globals.id, 'matchee': id.toString() } );
     if(response.statusCode == 800) {
       return   Alert(context: context,
         type: AlertType.error,
