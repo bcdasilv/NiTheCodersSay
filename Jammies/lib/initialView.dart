@@ -95,6 +95,7 @@ class initialViewState extends State<initialView> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
                 child: RaisedButton(
+                  key: Key('reg'),
                   child: Text("Register"),
                   onPressed: () {
                     Navigator.pushNamed(context, '/register');

@@ -113,6 +113,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('name'),
                         inputFormatters: <TextInputFormatter>[LengthLimitingTextInputFormatter(100)],
                         validator: (value) {
                           if(value.length == 0) {
@@ -131,6 +132,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('username'),
                         inputFormatters: <TextInputFormatter>[LengthLimitingTextInputFormatter(20)],
                         validator: (value) {
                           if(value.length == 0) {
@@ -149,6 +151,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('emailRegister'),
                         inputFormatters: <TextInputFormatter>[LengthLimitingTextInputFormatter(30)],
                         validator: (value) {
                           if(value.length == 0) {
@@ -167,6 +170,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('passwordRegister'),
                         validator: (value) {
                           if(value.length == 0) {
                             return "Please enter a password";
@@ -184,6 +188,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('passRegister'),
                         validator: (value) {
                           if(value.compareTo(passwordController.text) != 0) {
                             return "The passwords do not match";
@@ -200,6 +205,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                        key: Key('zip'),
                         validator: (value) {
                           if(value.length != 5) {
                             return "Zipcode is incorrect length";
@@ -219,6 +225,7 @@ class registerFieldState extends State<registerField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
+                          key: Key('date'),
                           validator: (value) {
                           if(selectedDate == null) {
                             return 'Please select a date';

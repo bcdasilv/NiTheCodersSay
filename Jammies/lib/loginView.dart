@@ -125,7 +125,6 @@ class loginFieldState extends State<loginField> {
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: RaisedButton(
-                        key: Key('failed'),
                         child: Text("Register"),
                         onPressed: () {
                           Navigator.pushNamed(context, '/register');

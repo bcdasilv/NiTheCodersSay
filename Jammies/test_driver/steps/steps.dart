@@ -118,4 +118,38 @@ class Jam_Validation extends ThenWithWorld<FlutterWorld> {
 
 }
 
-class
+class Register extends GivenWithWorld<FlutterWorld> {
+
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('reg'));
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('emailRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('emailRegister'),
+          'smparkin@calpoly.edu');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passwordRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('passwordRegister'), 'test');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('passRegister'), 'test');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('zip'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('zip'), '93401');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('date'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('date'), '5/31/20');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passRegister'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User’s email is not unique");
+}
+
+class RegisterButton extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('register'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User tries to register");
+
+}

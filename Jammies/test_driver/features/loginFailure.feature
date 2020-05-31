@@ -1,5 +1,4 @@
-Feature: Login Failure
-  User should not be able to login with an invalid credentials.
+Feature: Login
 
 Scenario: User cannot login with invalid email
     Given the user enters an invalid email
