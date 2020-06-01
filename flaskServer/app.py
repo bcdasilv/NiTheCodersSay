@@ -38,11 +38,11 @@ class Profiles(db.Model):
         self.spotify_key = None
         self.soundcloud_key = None
 
-class Posts(db.Model):     
-    postId = db.Column(db.Integer, primary_key=True)     
-    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)     
-    postDateTime = db.Column(db.DateTime, nullable=False)     
-    postTitle = db.Column(db.String(50), nullable=False)  
+class Posts(db.Model):
+    postId = db.Column(db.Integer, primary_key=True)
+    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    postDateTime = db.Column(db.DateTime, nullable=False)
+    postTitle = db.Column(db.String(50), nullable=False)
     postBody = db.Column(db.Text, nullable=True)
 
 class Users(db.Model):
@@ -166,19 +166,21 @@ def getPost():
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
-    jsonResponse = "{ 'posts': [ "
+
+    jsonResponse = '{ "posts": [ '
     postList = list(reversed(Posts.query.all()))
     for i in range(startid, startid+9):
         if i == len(postList):
             listJson = list(jsonResponse)
+            print(listJson)
             listJson[-2] = ''
             jsonResponse = "".join(listJson)
             break
-        jsonResponse += "{ 'postid': '" + str(postList[i].postId) + "', 'title': '" + postList[i].postTitle + "', 'authorid': '" + str(postList[i].profileId) + "', 'time': '" + str(postList[i].postDateTime) + "', 'content': '" + postList[i].postBody + "' }"
-        if i != startid+9:
-            jsonResponse += ", "
-    jsonResponse += "] }"
-    return jsonify(jsonResponse)
+        jsonResponse += '{ "postid": "' + str(postList[i].postId) + '", "title": "' + postList[i].postTitle + '", "authorid": "' + str(postList[i].profileId) + '", "time": "' + str(postList[i].postDateTime) + '", "content": "' + postList[i].postBody + '" }'
+        if i != startid+8:
+            jsonResponse += ', '
+    jsonResponse += '] }'
+    return Response(jsonResponse, status=200, mimetype='application/json')
 
 
 @app.route('/', methods=["GET", "POST"])
@@ -239,7 +241,10 @@ def register():
         dob = data['dob']
         name = data['name']
     except:
-        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+        return Response("{'error':'not all data provided'}", status=400, mimetype='application/json')
+
+    if not verifyZipcode(zipcode):
+        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
 
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
@@ -251,9 +256,17 @@ def register():
     db.session.commit()
     db.session.add(newuser)
     db.session.commit()
-    return Response("{'status':'User added to db'}", status=200, mimetype='application/json')
+    user = Users.query.filter_by(email=email).first()
+    return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
 
+  
+def verifyZipcode(zip1):
+    z1 = select_zipcode(zip1)
+    if not (z1):
+        return False
+    return True
 
+  
 @app.route('/login', methods=["POST"])
 def login():
     if request.json != None:
@@ -355,13 +368,92 @@ def getProfile():
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
 
-    def distance(zip1, zip2):
-        z1 = select_zipcode(zip1)
-        z2 = select_zipcode(zip2)
-        if not (z1) or not (z2):
-            return None
-        return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+  
+@app.route('/updateUser', methods=["POST"])
+def updateUser():
+    email = request.headers['email']
+    password = request.headers['password']
 
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+
+    try:
+        newEmail = data['email']
+        username = data['username']
+        newPassword = data['password']
+        zipcode = data['zipcode']
+        dob = data['dob']
+        name = data['name']
+    except:
+        return Response("{'error':'Not all User fields provided'}", status=400, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    if email != newEmail:
+        exists = db.session.query(db.exists().where(Users.email == newEmail)).scalar()
+        if exists:
+            return Response("{'error':'Email already exists'}", status=409, mimetype='application/json')
+    
+    if not verifyZipcode(zipcode):         
+        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
+
+    user.email = newEmail
+    user.username = username
+    user.password = newPassword
+    user.zipcode = zipcode
+    user.dob = dob
+    user.name = name
+
+    db.session.commit()
+    return Response("{'status':'User updated in db'}", status=200, mimetype='application/json')
+
+
+@app.route('/getUser', methods=["GET"])
+def getUser():
+    email = request.headers['email']
+    password = request.headers['password']
+    try:
+        userid = request.headers['userid']
+    except:
+        userid = None
+
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if userid == None:
+        user = Users.query.filter_by(email=email).first()
+    else:
+        user = Users.query.filter_by(id=userid).first()
+
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    email = user.email
+    username = user.username
+    password = user.password
+    zipcode = user.zipcode
+    dob = user.dob
+    name = user.name
+    return jsonify(name=name, username=username, email=email, password=password, dob=str(dob), zipcode=zipcode)
+
+
+def distance(zip1, zip2):
+    z1 = select_zipcode(zip1)
+    z2 = select_zipcode(zip2)
+    if not (z1) or not (z2):
+        return None
+    return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+
+  
 @app.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
@@ -417,4 +509,4 @@ def getNearby():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5000)

@@ -284,10 +284,8 @@ class _DiscoverView extends State<discoverView> {
 
   List<Widget> makePostList() {
     List<Widget> postList = List();
-
     for (var i = 0; i < posts.length; i++) {
       var currPost = posts[i];
-
       postList.add(
         Card(
           child: Padding(
@@ -319,13 +317,11 @@ class _DiscoverView extends State<discoverView> {
                   softWrap: true,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-
                 ),
                 expanded: Text(
                   currPost.content,
                   softWrap: true,
                 ),
-
               ),
             ),
           ),
@@ -336,7 +332,6 @@ class _DiscoverView extends State<discoverView> {
         ),
       );
     }
-
     return postList;
   }
 }

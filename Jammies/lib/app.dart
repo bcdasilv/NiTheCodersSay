@@ -7,6 +7,7 @@ import 'registerView.dart';
 import 'discoverView.dart';
 import 'initialView.dart';
 import 'myProfileView.dart';
+import 'editUserView.dart';
 
 class JamFinderApp extends StatelessWidget {
   @override
@@ -29,6 +30,7 @@ class JamFinderApp extends StatelessWidget {
         '/chat': (context) => chatView(),
         '/myProfileView': (context) => myProfileView(),
         '/editProfileView': (context) => editProfileView(),
+        '/editUser': (context) => editUserView(),
       },
     );
   }

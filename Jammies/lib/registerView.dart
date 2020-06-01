@@ -201,8 +201,9 @@ class registerFieldState extends State<registerField> {
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
                         validator: (value) {
-                          if(value.length != 5) {
-                            return "Zipcode is incorrect length";
+                          RegExp re = new RegExp(r'^[0-9]{5}(?:-[0-9]{4})?$');
+                          if(re.hasMatch(value) != true) {
+                            return "Invalid zipcode";
                           }
                           return null;
                         },
@@ -306,7 +307,14 @@ class registerFieldState extends State<registerField> {
       if(response.statusCode == 200) {
         _runPrompts(context);
       }
+      else if(response.statusCode == 422) {
+        return Alert(context: context, title: "Account already associated with email").show();
+      }
+      else if(response.statusCode == 423) {
+        return Alert(context: context, title: "Invalid zipcode").show();
+      }
       else {
+        print(response.statusCode.toString() + " " + response.body.toString());
         return Alert(context: context, title: response.body).show();
       }
     }
