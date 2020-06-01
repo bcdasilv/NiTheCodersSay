@@ -114,7 +114,6 @@ class _ChatView extends State<chatView> {
     List<Widget> cardList = List<Widget>();
 
     Map<String, String> header = {'email': email, 'password': password};
-    print(header);
     final response = await http.get(
       globals.server + '/getMatches',
       headers: header,
@@ -133,24 +132,17 @@ class _ChatView extends State<chatView> {
 
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
       matchedNames.add(jsonResponse['name']);
-
+      print(jsonResponse['name']);
       cardList.add(
         Card(
           child: Padding(
             padding: EdgeInsets.all(7),
             child: Row(
               children: <Widget>[
-                CircleAvatar(
-                  radius: 7,
-                  backgroundColor: Colors.indigo,
-                  backgroundImage: NetworkImage(
-                      globals.server + '/static/images/' +
-                          idList[i].toString()),
-                ),
                 IconButton(
                   icon: FadeInImage(
                       image: NetworkImage(
-                          globals.server + '/static/images/' + globals.id),
+                          globals.server + '/static/images/' + idList[i].toString()),
                       placeholder: AssetImage("assets/icon/icon.png")),
                   iconSize: 30,
                   onPressed: () {
@@ -163,17 +155,22 @@ class _ChatView extends State<chatView> {
                     ));
                   },
                 ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
                 Text(
                   jsonResponse['name'],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  'No conversation yet',
-                  style: TextStyle(
-                    color: Colors.grey[300],
-                  ),
+                    Text(
+                      'No conversation yet',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -181,8 +178,8 @@ class _ChatView extends State<chatView> {
         ),
       );
     }
-    print(matchedNames);
     return cardList;
   }
 }
+
 

@@ -292,7 +292,7 @@ class _JamView extends State<jamView>  {
                   "\nTry checking back later!",
                    textAlign: TextAlign.center,
               style: new TextStyle(
-                fontSize: 18.0,
+                fontSize: 16.0,
               ),
             ),
           ],

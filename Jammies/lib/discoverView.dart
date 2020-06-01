@@ -290,6 +290,8 @@ class _DiscoverView extends State<discoverView> {
 
       postList.add(
         Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
           Container(
@@ -330,7 +332,7 @@ class _DiscoverView extends State<discoverView> {
 
           ],
         ),
-
+          ),
         ),
       );
     }

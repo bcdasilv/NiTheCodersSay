@@ -19,6 +19,9 @@ class profileChatView extends StatelessWidget {
     var height = screenSize.height;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(name + "'s Profile"),
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -58,7 +61,7 @@ class profileChatView extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Text('Bio\n',
+                    child: Text('\nBio\n',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   Align(

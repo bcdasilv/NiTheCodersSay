@@ -32,7 +32,6 @@ class _MyProfileView extends State<myProfileView> {
         title: Text("My Profile"),
       ),
       body: SafeArea(
-
       child: FutureBuilder<Profile>(
           future: profile,
           builder: (context, snapshot) {
