@@ -3,7 +3,7 @@
 - Download the Dart SDK
 - Download the Flutter SDK
 - Install flutter dependencies
-- Install the Python packages listed in the import statements in flaskServer/app.py
+- Install the required Python packages using `pip3 install -r requirements.txt` in flaskServer folder
 
 
 
