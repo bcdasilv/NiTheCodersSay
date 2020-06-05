@@ -246,6 +246,7 @@ def register():
     if not verifyZipcode(zipcode):
         return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
 
+
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
         return Response("{'error':'User exists'}", status=422, mimetype='application/json')
@@ -367,7 +368,6 @@ def getProfile():
     about_me = profile.about_me
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
-
   
 @app.route('/updateUser', methods=["POST"])
 def updateUser():

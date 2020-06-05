@@ -106,6 +106,7 @@ class _ChatView extends State<chatView> {
     }
   }
 
+              
   Future<List<Widget>> _getMatches() async {
     final prefs = await SharedPreferences.getInstance();
     String email = prefs.getString('email');
@@ -129,7 +130,7 @@ class _ChatView extends State<chatView> {
       };
 
       var response = await http.get(globals.server + '/getProfile', headers: header);
-
+      
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
       matchedNames.add(jsonResponse['name']);
       print(jsonResponse['name']);
