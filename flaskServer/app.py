@@ -453,9 +453,6 @@ def getNearby():
     return jsonify(res)
 
 
-
-
-
 @bp.route('/makePost', methods=["POST"])
 def makePost():
     email = request.headers['email']
@@ -515,6 +512,8 @@ def getPost():
             jsonResponse += ', '
     jsonResponse += '] }'
     return Response(jsonResponse, status=200, mimetype='application/json')
+
+
 
 if __name__ == '__main__':
     app = create_app()
