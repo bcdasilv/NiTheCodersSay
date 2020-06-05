@@ -96,6 +96,7 @@ class _MyProfileView extends State<myProfileView> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: RaisedButton(
+                          key: Key('editProfile'),
                           color: Colors.indigo,
                           child: Text(
                             'Edit',

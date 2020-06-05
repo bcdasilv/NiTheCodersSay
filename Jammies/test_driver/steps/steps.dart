@@ -1,6 +1,7 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:gherkin/gherkin.dart';
+import 'package:flutter_driver/flutter_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:password/password.dart';
@@ -25,7 +26,7 @@ class LoginValidation extends GivenWithWorld<FlutterWorld> {
 
   @override
   // TODO: implement pattern
-  RegExp get pattern => RegExp(r"Given the user enters an invalid email");
+  RegExp get pattern => RegExp(r"the user enters an invalid email");
 }
 
 class PasswordValidation extends AndWithWorld<FlutterWorld> {
@@ -83,7 +84,7 @@ class LoginSuccessValidation extends GivenWithWorld<FlutterWorld> {
 
   @override
   // TODO: implement pattern
-  RegExp get pattern => RegExp(r"Given the user enters a valid email");
+  RegExp get pattern => RegExp(r"the user enters a valid email");
 }
 
 class PasswordSuccessValidation extends AndWithWorld<FlutterWorld> {
@@ -109,12 +110,12 @@ class Jam_Validation extends ThenWithWorld<FlutterWorld> {
   @override
   Future<void> executeStep() async {
     await FlutterDriverUtils.waitForFlutter(world.driver);
-    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('submit'));
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('jam'));
   }
 
   @override
   // TODO: implement pattern
-  RegExp get pattern => RegExp(r"the user should land on the jam screen");
+  RegExp get pattern => RegExp(r"the user is logged in");
 
 }
 
@@ -125,7 +126,7 @@ class Register extends GivenWithWorld<FlutterWorld> {
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('reg'));
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('emailRegister'));
     await FlutterDriverUtils.enterText(world.driver, find.byValueKey('emailRegister'),
-          'smparkin@calpoly.edu');
+          'test432');
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('passwordRegister'));
     await FlutterDriverUtils.enterText(world.driver, find.byValueKey('passwordRegister'), 'test');
     await FlutterDriverUtils.tap(world.driver, find.byValueKey('passRegister'));
@@ -153,3 +154,168 @@ class RegisterButton extends WhenWithWorld<FlutterWorld> {
   RegExp get pattern => RegExp(r"the User tries to register");
 
 }
+
+class RegisterStatus extends ThenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('register'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User is asked if they already have an account");
+}
+
+class RegisterFailed extends AndWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('login'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User is redirected to the initial view");
+}
+
+class RegisterUnique extends GivenWithWorld<FlutterWorld> {
+
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('reg'));
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('emailRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('emailRegister'),
+        'smparkin@calpoly.edu');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passwordRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('passwordRegister'), 'test');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passRegister'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('passRegister'), 'test');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('zip'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('zip'), '93401');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('date'));
+    await FlutterDriverUtils.enterText(world.driver, find.byValueKey('date'), '5/31/20');
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('passRegister'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User’s email is unique");
+}
+
+class Jam extends ThenWithWorld<FlutterWorld> {
+
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('jam'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user is on the jam screen");
+
+}
+
+class ShowRight extends ThenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('right'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user sees the green background confirming they swiped right");
+
+}
+
+class ShowLeft extends ThenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('left'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user sees the red background confirming they swiped right");
+
+}
+
+class SwipeRight extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('right'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user swipes right on the current user");
+
+}
+
+class SwipeLeft extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('left'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user swipes left on the current user");
+
+}
+
+class SelectProfile extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('profile'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User clicks on the My Profile button");
+}
+
+class SelectEdit extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('editProfile'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User selects “Edit Profile’ on their profile screen");
+}
+
+class CanEdit extends ThenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('canEdit'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"all text fields are changed to editable text fields");
+
+}
+
+
+class DiscoverNav extends WhenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.tap(world.driver, find.byValueKey('discover'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the User navigates to the Discover page");
+}
+
+class ViewPost extends ThenWithWorld<FlutterWorld> {
+  @override
+  Future<void> executeStep() async {
+    await FlutterDriverUtils.isPresent(world.driver, find.byValueKey('tapDiscover'));
+  }
+
+  @override
+  // TODO: implement pattern
+  RegExp get pattern => RegExp(r"the user can see individual posts");
+}
+

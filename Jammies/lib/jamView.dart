@@ -50,10 +50,12 @@ class _JamView extends State<jamView>  {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Key('jam'),
         appBar: AppBar(
           title: Text("Jam"),
           actions: <Widget>[
             IconButton(
+              key: Key('profile'),
               icon: globals.profilePhoto == null
                   ? FadeInImage(
                       image: NetworkImage(globals.server + '/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
@@ -67,6 +69,7 @@ class _JamView extends State<jamView>  {
           ],
         ),
         body: Center(
+          key: Key('card'),
           child: FutureBuilder<List<ProfileCard>>(
             future: futureCards,
             builder: (context, snapshot) {
@@ -81,6 +84,7 @@ class _JamView extends State<jamView>  {
           )
           ),
         bottomNavigationBar: BottomNavigationBar(
+          key: Key('tapDiscover'),
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(
@@ -104,6 +108,7 @@ class _JamView extends State<jamView>  {
               ),
             ),
             BottomNavigationBarItem(
+
               icon: Icon(
                   Icons.map,
                   color: Colors.indigo,
@@ -212,6 +217,7 @@ class _JamView extends State<jamView>  {
 
   Widget slideRightBackground(var id) {
     return Container(
+      key: Key('right'),
       color: Colors.green,
       child: Align(
         child: Row(
@@ -259,6 +265,7 @@ class _JamView extends State<jamView>  {
 
   Widget slideLeftBackground() {
     return Container(
+      key: Key('left'),
       color: Colors.red,
       child: Align(
         child: Row(

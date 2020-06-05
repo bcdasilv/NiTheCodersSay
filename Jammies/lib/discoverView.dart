@@ -55,6 +55,7 @@ class _DiscoverView extends State<discoverView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Key('discover'),
       appBar: AppBar(title: Text('Discover'), actions: <Widget>[
         IconButton(
           icon: globals.profilePhoto == null

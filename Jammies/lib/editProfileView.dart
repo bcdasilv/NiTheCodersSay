@@ -119,6 +119,7 @@ class editProfileState extends State<editProfileView> {
                 ],
               ),
               Align(
+                key: Key('canEdit'),
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),

@@ -1,7 +1,6 @@
 Feature: Register
 
-  Scenario: User tries to register with an already taken email
-    Given the User’s email is not unique
+  Scenario: User tries to register with a unique email
+    Given the User’s email is unique
     When the User tries to register
-    Then the User is asked if they already have an account
-    And the User is redirected to the login page
+    Then the User is logged in
