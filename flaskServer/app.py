@@ -98,7 +98,6 @@ def register():
     if not verifyZipcode(zipcode):
         return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
 
-
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
         return Response("{'error':'User exists'}", status=422, mimetype='application/json')
@@ -415,13 +414,10 @@ def getNearby():
 
     userZipcode = user.zipcode
 
-    #Var to control how many people are shown to the user
     nearbyLimit = 50
 
-    #Get people in the same zipcode as user first in a list
     sameZipcode = Users.query.filter(Users.zipcode.like(userZipcode), Users.id != user.id).all()
 
-    #Get same zipcode people's id in result list
     res = []
     count = 0
     for person in sameZipcode:
@@ -431,22 +427,16 @@ def getNearby():
         else:
             break
 
-    #Look at other zipcodes if limit not reached
     if count != nearbyLimit:
 
-        #Filter people already in res
-        #Can also filter_by zipcode!=userZipcode instead
         otherZipcode = Users.query.filter(Users.id.notin_(res), Users.id != user.id).limit(nearbyLimit-count).all()
 
-        #Array of tuples: (id, distance)
         temp = []
         for person in otherZipcode:
-            #Stephen's distance function goes below with args: user.zipcode and person.zipcode
             dist = distance(userZipcode, person.zipcode)
             if dist != None:
                 temp.append((person.id, dist))
 
-        #Sort based on distance and add to result list
         temp.sort(key=lambda x: x[1])
         res+= [i[0] for i in temp]
 
@@ -496,7 +486,6 @@ def getPost():
 
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
 
     jsonResponse = '{ "posts": [ '
     postList = list(reversed(Posts.query.all()))

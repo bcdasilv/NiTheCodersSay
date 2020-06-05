@@ -1,11 +1,11 @@
 import sqlalchemy
 import math
 
-db = sqlalchemy.create_engine('sqlite:///zipcodes.db')
-db.echo = False
+dbaa = sqlalchemy.create_engine('sqlite:///zipcodes.db')
+dbaa.echo = False
 
 def build_metadata():
-    metadata = sqlalchemy.MetaData(db)
+    metadata = sqlalchemy.MetaData(dbaa)
     metadata.bind.echo = False
     metadata.bind.text_factory = str
     return metadata
