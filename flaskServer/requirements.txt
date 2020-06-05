@@ -5,3 +5,4 @@ pytest>=5.2
 mysqlclient
 datetime
 pytest-flask
+pytest-coverage
