@@ -4,3 +4,4 @@ flask_sqlalchemy
 pytest
 mysqlclient
 datetime
+pytest-flask
