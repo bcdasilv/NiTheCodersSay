@@ -9,10 +9,19 @@ from datetime import datetime
 
 UPLOAD_FOLDER = '/home/smparkin/NiTheCodersSay/flaskServer/static/images'
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+bp = Blueprint("myapp", __name__)
+
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.register_blueprint(bp)
+    db = SQLAlchemy(app)
+    app.app_context().push()
+    return app
+
+app = create_app()
 db = SQLAlchemy(app)
 
 class Matchings(db.Model):
@@ -31,18 +40,18 @@ class Profiles(db.Model):
     spotify_key = db.Column(db.Integer)
     soundcloud_key = db.Column(db.Integer)
 
-    def __init__(self):
-        self.about_me = None
-        self.bio = None
+    def __init__(self, about_me, bio):
+        self.about_me = about_me
+        self.bio = bio
         self.pic_path = None
         self.spotify_key = None
         self.soundcloud_key = None
 
-class Posts(db.Model):     
-    postId = db.Column(db.Integer, primary_key=True)     
-    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)     
-    postDateTime = db.Column(db.DateTime, nullable=False)     
-    postTitle = db.Column(db.String(50), nullable=False)  
+class Posts(db.Model):
+    postId = db.Column(db.Integer, primary_key=True)
+    profileId = db.Column(db.Integer, db.ForeignKey('profiles.id'), nullable=False)
+    postDateTime = db.Column(db.DateTime, nullable=False)
+    postTitle = db.Column(db.String(50), nullable=False)
     postBody = db.Column(db.Text, nullable=True)
 
 class Users(db.Model):
@@ -62,12 +71,9 @@ class Users(db.Model):
         self.dob = dob
         self.name = name
 
-    def __repr__(self):
-        return '<User %r>' % self.id
 
 
-
-@app.route('/match', methods=["POST"])
+@bp.route('/match', methods=["POST"])
 def match():
     email = request.headers['email']
     password = request.headers['password']
@@ -97,7 +103,7 @@ def match():
         return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
 
 
-@app.route('/getMatches', methods=["GET"])
+@bp.route('/getMatches', methods=["GET"])
 def getMatches():
     email = request.headers['email']
     password = request.headers['password']
@@ -122,7 +128,7 @@ def getMatches():
     return jsonify(matchList)
 
 
-@app.route('/makePost', methods=["POST"])
+@bp.route('/makePost', methods=["POST"])
 def makePost():
     email = request.headers['email']
     password = request.headers['password']
@@ -152,7 +158,7 @@ def makePost():
     return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
 
 
-@app.route('/getPost', methods=["GET"])
+@bp.route('/getPost', methods=["GET"])
 def getPost():
     email = request.headers['email']
     password = request.headers['password']
@@ -183,13 +189,13 @@ def getPost():
     return Response(jsonResponse, status=200, mimetype='application/json')
 
 
-@app.route('/', methods=["GET", "POST"])
+@bp.route('/', methods=["GET", "POST"])
 def home():
     message = "Hello there"
     return render_template('index.html', message=message)
 
 
-@app.route('/upload', methods=["POST"])
+@bp.route('/upload', methods=["POST"])
 def upload():
     email = request.headers['email']
     password = request.headers['password']
@@ -209,7 +215,7 @@ def upload():
         return Response("{'error':'Unable to save image'}", status=420, mimetype='application/json')
 
 
-@app.route('/download', methods=["GET"])
+@bp.route('/download', methods=["GET"])
 def download():
     email = request.headers['email']
     password = request.headers['password']
@@ -227,7 +233,7 @@ def download():
         return Response("{'error':'Unable to retrieve image'}", status=420, mimetype='application/json')
 
 
-@app.route('/register', methods=["POST"])
+@bp.route('/register', methods=["POST"])
 def register():
     if request.json != None:
         data = request.json
@@ -243,6 +249,10 @@ def register():
     except:
         return Response("{'error':'not all data provided'}", status=400, mimetype='application/json')
 
+    if not verifyZipcode(zipcode):
+        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
+
+
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
         return Response("{'error':'User exists'}", status=422, mimetype='application/json')
@@ -256,8 +266,15 @@ def register():
     user = Users.query.filter_by(email=email).first()
     return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
 
+  
+def verifyZipcode(zip1):
+    z1 = select_zipcode(zip1)
+    if not (z1):
+        return False
+    return True
 
-@app.route('/login', methods=["POST"])
+  
+@bp.route('/login', methods=["POST"])
 def login():
     if request.json != None:
         data = request.json
@@ -287,7 +304,7 @@ def verify(email, password):
     return False
 
 
-@app.route('/updateProfile', methods=["POST"])
+@bp.route('/updateProfile', methods=["POST"])
 def updateProfile():
     email = request.headers['email']
     password = request.headers['password']
@@ -328,7 +345,7 @@ def updateProfile():
     return Response("{'status':'Profile updated in db'}", status=200, mimetype='application/json')
 
 
-@app.route('/getProfile', methods=["GET"])
+@bp.route('/getProfile', methods=["GET"])
 def getProfile():
     email = request.headers['email']
     password = request.headers['password']
@@ -357,15 +374,93 @@ def getProfile():
     about_me = profile.about_me
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
+  
+@bp.route('/updateUser', methods=["POST"])
+def updateUser():
+    email = request.headers['email']
+    password = request.headers['password']
 
-    def distance(zip1, zip2):
-        z1 = select_zipcode(zip1)
-        z2 = select_zipcode(zip2)
-        if not (z1) or not (z2):
-            return None
-        return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
-@app.route('/getNearby', methods=["GET"])
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+
+    try:
+        newEmail = data['email']
+        username = data['username']
+        newPassword = data['password']
+        zipcode = data['zipcode']
+        dob = data['dob']
+        name = data['name']
+    except:
+        return Response("{'error':'Not all User fields provided'}", status=400, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    if email != newEmail:
+        exists = db.session.query(db.exists().where(Users.email == newEmail)).scalar()
+        if exists:
+            return Response("{'error':'Email already exists'}", status=409, mimetype='application/json')
+    
+    if not verifyZipcode(zipcode):         
+        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
+
+    user.email = newEmail
+    user.username = username
+    user.password = newPassword
+    user.zipcode = zipcode
+    user.dob = dob
+    user.name = name
+
+    db.session.commit()
+    return Response("{'status':'User updated in db'}", status=200, mimetype='application/json')
+
+
+@bp.route('/getUser', methods=["GET"])
+def getUser():
+    email = request.headers['email']
+    password = request.headers['password']
+    try:
+        userid = request.headers['userid']
+    except:
+        userid = None
+
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if userid == None:
+        user = Users.query.filter_by(email=email).first()
+    else:
+        user = Users.query.filter_by(id=userid).first()
+
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    email = user.email
+    username = user.username
+    password = user.password
+    zipcode = user.zipcode
+    dob = user.dob
+    name = user.name
+    return jsonify(name=name, username=username, email=email, password=password, dob=str(dob), zipcode=zipcode)
+
+
+def distance(zip1, zip2):
+    z1 = select_zipcode(zip1)
+    z2 = select_zipcode(zip2)
+    if not (z1) or not (z2):
+        return None
+    return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
+
+  
+@bp.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
     password = request.headers['password']
@@ -418,6 +513,6 @@ def getNearby():
     return jsonify(res)
 
 
-
 if __name__ == '__main__':
+    app = create_app()
     app.run(host='0.0.0.0', port=5000)
