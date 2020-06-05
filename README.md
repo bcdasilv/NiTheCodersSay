@@ -23,7 +23,7 @@ Coding Style Guides:
 For dart code: https://dart.dev/guides/language/effective-dart/style
 Note: to run analysis on code, use 'flutter analyze'
 
-For python code: https://www.python.org/dev/peps/pep-0008/
+For python code: A modified version of PEP8 that allows longer lines and camel case for function names https://www.python.org/dev/peps/pep-0008/
 
 System Architecture (Feb 7 Class Assignment)
 
