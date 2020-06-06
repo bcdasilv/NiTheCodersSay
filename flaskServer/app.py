@@ -9,10 +9,19 @@ from datetime import datetime
 
 UPLOAD_FOLDER = '/home/smparkin/NiTheCodersSay/flaskServer/static/images'
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+bp = Blueprint("myapp", __name__)
+
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://'+os.getenv('MYSQL_USER')+':'+os.getenv('MYSQL_PASS')+'@localhost/jammies'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.register_blueprint(bp)
+    db = SQLAlchemy(app)
+    app.app_context().push()
+    return app
+
+app = create_app()
 db = SQLAlchemy(app)
 
 class Matchings(db.Model):
@@ -31,9 +40,9 @@ class Profiles(db.Model):
     spotify_key = db.Column(db.Integer)
     soundcloud_key = db.Column(db.Integer)
 
-    def __init__(self):
-        self.about_me = None
-        self.bio = None
+    def __init__(self, about_me, bio):
+        self.about_me = about_me
+        self.bio = bio
         self.pic_path = None
         self.spotify_key = None
         self.soundcloud_key = None
@@ -62,172 +71,15 @@ class Users(db.Model):
         self.dob = dob
         self.name = name
 
-    def __repr__(self):
-        return '<User %r>' % self.id
 
 
-
-@app.route('/match', methods=["POST"])
-def match():
-    email = request.headers['email']
-    password = request.headers['password']
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    if request.json != None:
-        data = request.json
-    else:
-        data = request.form
-    try:
-        matcher = data['matcher']
-        matchee = data['matchee']
-    except:
-        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
-
-    match = Matchings.query.filter_by(matcherId=matcher).filter_by(matcheeId=matchee).first()
-    if match == None:
-        newMatch = Matchings(matcher, matchee)
-        db.session.add(newMatch)
-        db.session.commit()
-        return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
-    else:
-        return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
-
-
-@app.route('/getMatches', methods=["GET"])
-def getMatches():
-    email = request.headers['email']
-    password = request.headers['password']
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    user = Users.query.filter_by(email=email).first()
-    if user == None:
-        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
-
-    matchedWithUser = Matchings.query.filter_by(matcheeId=user.id).all()
-
-    matchList = []
-    for i in matchedWithUser:
-        userMatched = Matchings.query.filter_by(matcherId=user.id).filter_by(matcheeId=i.matcherId).first()
-        if userMatched != None:
-            matchList.append(i.matcherId)
-
-    return jsonify(matchList)
-
-
-@app.route('/makePost', methods=["POST"])
-def makePost():
-    email = request.headers['email']
-    password = request.headers['password']
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    if request.json != None:
-        data = request.json
-    else:
-        data = request.form
-    try:
-        postTitle = data['title']
-        postBody = data['body']
-    except:
-        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
-
-    user = Users.query.filter_by(email=email).first()
-    if user == None:
-        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
-
-    newPost = Posts(profileId=user.id, postDateTime=datetime.now(), postTitle=postTitle, postBody=postBody)
-    db.session.add(newPost)
-    db.session.commit()
-    return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
-
-
-@app.route('/getPost', methods=["GET"])
-def getPost():
-    email = request.headers['email']
-    password = request.headers['password']
-    try:
-        startid = request.headers['startid']
-    except:
-        startid = 0
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-
-    jsonResponse = '{ "posts": [ '
-    postList = list(reversed(Posts.query.all()))
-    for i in range(startid, startid+9):
-        if i == len(postList):
-            listJson = list(jsonResponse)
-            print(listJson)
-            listJson[-2] = ''
-            jsonResponse = "".join(listJson)
-            break
-        jsonResponse += '{ "postid": "' + str(postList[i].postId) + '", "title": "' + postList[i].postTitle + '", "authorid": "' + str(postList[i].profileId) + '", "time": "' + str(postList[i].postDateTime) + '", "content": "' + postList[i].postBody + '" }'
-        if i != startid+8:
-            jsonResponse += ', '
-    jsonResponse += '] }'
-    return Response(jsonResponse, status=200, mimetype='application/json')
-
-
-@app.route('/', methods=["GET", "POST"])
+@bp.route('/', methods=["GET", "POST"])
 def home():
     message = "Hello there"
     return render_template('index.html', message=message)
 
 
-@app.route('/upload', methods=["POST"])
-def upload():
-    email = request.headers['email']
-    password = request.headers['password']
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    user = Users.query.filter_by(email=email).first()
-    try:
-        image = request.files['file']
-        filename = secure_filename(str(user.id))
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return Response("{'status':'Saved image'}", status=200, mimetype='application/json')
-    except:
-        return Response("{'error':'Unable to save image'}", status=420, mimetype='application/json')
-
-
-@app.route('/download', methods=["GET"])
-def download():
-    email = request.headers['email']
-    password = request.headers['password']
-
-    valid = verify(email, password)
-
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    user = Users.query.filter_by(email=email).first()
-    try:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(str(user.id)))
-        return send_file(filename, mimetype='image/jpg')
-    except:
-        return Response("{'error':'Unable to retrieve image'}", status=420, mimetype='application/json')
-
-
-@app.route('/register', methods=["POST"])
+@bp.route('/register', methods=["POST"])
 def register():
     if request.json != None:
         data = request.json
@@ -246,13 +98,12 @@ def register():
     if not verifyZipcode(zipcode):
         return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
 
-
     exists = db.session.query(db.exists().where(Users.email == email)).scalar()
     if exists:
         return Response("{'error':'User exists'}", status=422, mimetype='application/json')
 
     newuser = Users(email, username, password, zipcode, dob, name)
-    newprofile = Profiles()
+    newprofile = Profiles("none", "none")
     db.session.add(newprofile)
     db.session.commit()
     db.session.add(newuser)
@@ -260,15 +111,8 @@ def register():
     user = Users.query.filter_by(email=email).first()
     return Response("{'userid':'"+str(user.id)+"'}", status=200, mimetype='application/json')
 
-  
-def verifyZipcode(zip1):
-    z1 = select_zipcode(zip1)
-    if not (z1):
-        return False
-    return True
 
-  
-@app.route('/login', methods=["POST"])
+@bp.route('/login', methods=["POST"])
 def login():
     if request.json != None:
         data = request.json
@@ -298,7 +142,137 @@ def verify(email, password):
     return False
 
 
-@app.route('/updateProfile', methods=["POST"])
+@bp.route('/upload', methods=["POST"])
+def upload():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    try:
+        image = request.files['file']
+        filename = secure_filename(str(user.id))
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return Response("{'status':'Saved image'}", status=200, mimetype='application/json')
+    except:
+        return Response("{'error':'Unable to save image'}", status=420, mimetype='application/json')
+
+
+@bp.route('/download', methods=["GET"])
+def download():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    try:
+        filename = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(str(user.id)))
+        return send_file(filename, mimetype='image/jpg')
+    except:
+        return Response("{'error':'Unable to retrieve image'}", status=420, mimetype='application/json')
+
+
+def verifyZipcode(zip1):
+    z1 = select_zipcode(zip1)
+    if not (z1):
+        return False
+    return True
+
+  
+@bp.route('/updateUser', methods=["POST"])
+def updateUser():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+
+    try:
+        newEmail = data['email']
+        username = data['username']
+        newPassword = data['password']
+        zipcode = data['zipcode']
+        dob = data['dob']
+        name = data['name']
+    except:
+        return Response("{'error':'Not all User fields provided'}", status=400, mimetype='application/json')
+
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    if email != newEmail:
+        exists = db.session.query(db.exists().where(Users.email == newEmail)).scalar()
+        if exists:
+            return Response("{'error':'Email already exists'}", status=409, mimetype='application/json')
+    
+    if not verifyZipcode(zipcode):         
+        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
+
+    user.email = newEmail
+    user.username = username
+    user.password = newPassword
+    user.zipcode = zipcode
+    user.dob = dob
+    user.name = name
+
+    db.session.commit()
+    return Response("{'status':'User updated in db'}", status=200, mimetype='application/json')
+
+  
+def verifyZipcode(zip1):
+    z1 = select_zipcode(zip1)
+    if not (z1):
+        return False
+    return True
+
+
+@bp.route('/getUser', methods=["GET"])
+def getUser():
+    email = request.headers['email']
+    password = request.headers['password']
+    try:
+        userid = request.headers['userid']
+    except:
+        userid = None
+
+    valid = verify(email, password)
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if userid == None:
+        user = Users.query.filter_by(email=email).first()
+    else:
+        user = Users.query.filter_by(id=userid).first()
+
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    email = user.email
+    username = user.username
+    password = user.password
+    zipcode = user.zipcode
+    dob = user.dob
+    name = user.name
+    return jsonify(name=name, username=username, email=email, password=password, dob=str(dob), zipcode=zipcode)
+
+
+@bp.route('/updateProfile', methods=["POST"])
 def updateProfile():
     email = request.headers['email']
     password = request.headers['password']
@@ -339,7 +313,7 @@ def updateProfile():
     return Response("{'status':'Profile updated in db'}", status=200, mimetype='application/json')
 
 
-@app.route('/getProfile', methods=["GET"])
+@bp.route('/getProfile', methods=["GET"])
 def getProfile():
     email = request.headers['email']
     password = request.headers['password']
@@ -368,13 +342,15 @@ def getProfile():
     about_me = profile.about_me
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
-  
-@app.route('/updateUser', methods=["POST"])
-def updateUser():
+
+
+@bp.route('/match', methods=["POST"])
+def match():
     email = request.headers['email']
     password = request.headers['password']
 
     valid = verify(email, password)
+
     if not valid:
         return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
@@ -382,68 +358,45 @@ def updateUser():
         data = request.json
     else:
         data = request.form
-
     try:
-        newEmail = data['email']
-        username = data['username']
-        newPassword = data['password']
-        zipcode = data['zipcode']
-        dob = data['dob']
-        name = data['name']
+        matcher = data['matcher']
+        matchee = data['matchee']
     except:
-        return Response("{'error':'Not all User fields provided'}", status=400, mimetype='application/json')
+        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+
+    match = Matchings.query.filter_by(matcherId=matcher).filter_by(matcheeId=matchee).first()
+    if match == None:
+        newMatch = Matchings(matcher, matchee)
+        db.session.add(newMatch)
+        db.session.commit()
+        return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
+    else:
+        return Response("{'error':'Match already in db'}", status=418, mimetype='application/json')
+
+
+@bp.route('/getMatches', methods=["GET"])
+def getMatches():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
 
     user = Users.query.filter_by(email=email).first()
     if user == None:
         return Response("{'error':'No such user'}", status=422, mimetype='application/json')
 
-    if email != newEmail:
-        exists = db.session.query(db.exists().where(Users.email == newEmail)).scalar()
-        if exists:
-            return Response("{'error':'Email already exists'}", status=409, mimetype='application/json')
-    
-    if not verifyZipcode(zipcode):         
-        return Response("{'error':'Zipcode does not exist'}", status=423, mimetype='application/json')
+    matchedWithUser = Matchings.query.filter_by(matcheeId=user.id).all()
 
-    user.email = newEmail
-    user.username = username
-    user.password = newPassword
-    user.zipcode = zipcode
-    user.dob = dob
-    user.name = name
+    matchList = []
+    for i in matchedWithUser:
+        userMatched = Matchings.query.filter_by(matcherId=user.id).filter_by(matcheeId=i.matcherId).first()
+        if userMatched != None:
+            matchList.append(i.matcherId)
 
-    db.session.commit()
-    return Response("{'status':'User updated in db'}", status=200, mimetype='application/json')
-
-
-@app.route('/getUser', methods=["GET"])
-def getUser():
-    email = request.headers['email']
-    password = request.headers['password']
-    try:
-        userid = request.headers['userid']
-    except:
-        userid = None
-
-    valid = verify(email, password)
-    if not valid:
-        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
-
-    if userid == None:
-        user = Users.query.filter_by(email=email).first()
-    else:
-        user = Users.query.filter_by(id=userid).first()
-
-    if user == None:
-        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
-
-    email = user.email
-    username = user.username
-    password = user.password
-    zipcode = user.zipcode
-    dob = user.dob
-    name = user.name
-    return jsonify(name=name, username=username, email=email, password=password, dob=str(dob), zipcode=zipcode)
+    return jsonify(matchList)
 
 
 def distance(zip1, zip2):
@@ -453,8 +406,8 @@ def distance(zip1, zip2):
         return None
     return haversine(z1['lat'], z1['long'], z2['lat'], z2['long'])
 
-  
-@app.route('/getNearby', methods=["GET"])
+
+@bp.route('/getNearby', methods=["GET"])
 def getNearby():
     email = request.headers['email']
     password = request.headers['password']
@@ -469,13 +422,10 @@ def getNearby():
 
     userZipcode = user.zipcode
 
-    #Var to control how many people are shown to the user
     nearbyLimit = 50
 
-    #Get people in the same zipcode as user first in a list
     sameZipcode = Users.query.filter(Users.zipcode.like(userZipcode), Users.id != user.id).all()
 
-    #Get same zipcode people's id in result list
     res = []
     count = 0
     for person in sameZipcode:
@@ -485,28 +435,83 @@ def getNearby():
         else:
             break
 
-    #Look at other zipcodes if limit not reached
     if count != nearbyLimit:
 
-        #Filter people already in res
-        #Can also filter_by zipcode!=userZipcode instead
         otherZipcode = Users.query.filter(Users.id.notin_(res), Users.id != user.id).limit(nearbyLimit-count).all()
 
-        #Array of tuples: (id, distance)
         temp = []
         for person in otherZipcode:
-            #Stephen's distance function goes below with args: user.zipcode and person.zipcode
             dist = distance(userZipcode, person.zipcode)
             if dist != None:
                 temp.append((person.id, dist))
 
-        #Sort based on distance and add to result list
         temp.sort(key=lambda x: x[1])
         res+= [i[0] for i in temp]
 
     return jsonify(res)
 
 
+@bp.route('/makePost', methods=["POST"])
+def makePost():
+    email = request.headers['email']
+    password = request.headers['password']
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    if request.json != None:
+        data = request.json
+    else:
+        data = request.form
+    try:
+        postTitle = data['title']
+        postBody = data['body']
+    except:
+        return Response("{'error':'Not all fields provided'}", status=400, mimetype='application/json')
+
+    user = Users.query.filter_by(email=email).first()
+    if user == None:
+        return Response("{'error':'No such user'}", status=422, mimetype='application/json')
+
+    newPost = Posts(profileId=user.id, postDateTime=datetime.now(), postTitle=postTitle, postBody=postBody)
+    db.session.add(newPost)
+    db.session.commit()
+    return Response("{'status':'Added to db'}", status=200, mimetype='application/json')
+
+
+@bp.route('/getPost', methods=["GET"])
+def getPost():
+    email = request.headers['email']
+    password = request.headers['password']
+    try:
+        startid = request.headers['startid']
+    except:
+        startid = 0
+
+    valid = verify(email, password)
+
+    if not valid:
+        return Response("{'error':'Incorrect email or password'}", status=401, mimetype='application/json')
+
+    jsonResponse = '{ "posts": [ '
+    postList = list(reversed(Posts.query.all()))
+    for i in range(startid, startid+9):
+        if i == len(postList):
+            listJson = list(jsonResponse)
+            print(listJson)
+            listJson[-2] = ''
+            jsonResponse = "".join(listJson)
+            break
+        jsonResponse += '{ "postid": "' + str(postList[i].postId) + '", "title": "' + postList[i].postTitle + '", "authorid": "' + str(postList[i].profileId) + '", "time": "' + str(postList[i].postDateTime) + '", "content": "' + postList[i].postBody + '" }'
+        if i != startid+8:
+            jsonResponse += ', '
+    jsonResponse += '] }'
+    return Response(jsonResponse, status=200, mimetype='application/json')
+
+
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(host='0.0.0.0', port=5000)

@@ -1,6 +1,8 @@
 flask
 flask_api
 flask_sqlalchemy
-pytest
+pytest>=5.2
 mysqlclient
 datetime
+pytest-flask
+pytest-coverage
