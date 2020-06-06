@@ -103,7 +103,7 @@ def register():
         return Response("{'error':'User exists'}", status=422, mimetype='application/json')
 
     newuser = Users(email, username, password, zipcode, dob, name)
-    newprofile = Profiles()
+    newprofile = Profiles("none", "none")
     db.session.add(newprofile)
     db.session.commit()
     db.session.add(newuser)
