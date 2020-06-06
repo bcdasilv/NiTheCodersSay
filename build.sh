@@ -1,4 +1,3 @@
 cd flaskServer/
 pip install -r requirements.txt
-cd tests/
-pytest
+pytest --cov=app --cov-report term-missing tests/
