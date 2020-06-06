@@ -1,3 +1,6 @@
+## Wiki
+- https://github.com/smparkin/NiTheCodersSay/wiki
+
 ## Setup
 
 - Download the Dart SDK
