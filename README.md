@@ -13,6 +13,10 @@ To run the acceptance tests, execute the following command from the flutter proj
   ```
   $ dart test_driver/app_test.dart
   ```
+To run the unittests, execute the following command in flaskServer:
+  ```
+  pytest --cov=app --cov-report term-missing tests/
+  ```
 
 Back-end: [![Build Status](https://travis-ci.com/smparkin/NiTheCodersSay.svg?branch=master)](https://travis-ci.com/smparkin/NiTheCodersSay)
 
