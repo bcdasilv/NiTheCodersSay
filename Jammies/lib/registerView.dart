@@ -201,8 +201,9 @@ class registerFieldState extends State<registerField> {
                       padding: EdgeInsets.symmetric(vertical: 10.0),
                       child: TextFormField(
                         validator: (value) {
-                          if(value.length != 5) {
-                            return "Zipcode is incorrect length";
+                          RegExp re = new RegExp(r'^[0-9]{5}(?:-[0-9]{4})?$');
+                          if(re.hasMatch(value) != true) {
+                            return "Invalid zipcode";
                           }
                           return null;
                         },
@@ -299,14 +300,21 @@ class registerFieldState extends State<registerField> {
       final hash = sha512.convert(utf8.encode(passwordController.text));
 
       print("${selectedDate.toString()}".split(' ')[0]);
-      final response = await http.post('http://jam.smpark.in/register', body:
+      final response = await http.post(globals.server + '/register', body:
       { 'email': emailController.text, 'password': "$hash", 'name': nameController.text,
       'zipcode': zcController.text, 'dob': "${selectedDate.toString()}".split(' ')[0], 'username': userNameController.text} );
 
       if(response.statusCode == 200) {
         _runPrompts(context);
       }
+      else if(response.statusCode == 422) {
+        return Alert(context: context, title: "Account already associated with email").show();
+      }
+      else if(response.statusCode == 423) {
+        return Alert(context: context, title: "Invalid zipcode").show();
+      }
       else {
+        print(response.statusCode.toString() + " " + response.body.toString());
         return Alert(context: context, title: response.body).show();
       }
     }
@@ -564,7 +572,7 @@ class photoPromptState extends State<photoPrompt> {
     String email = prefs.getString('email');
     String password = prefs.getString('password');
 
-    final response = await http.post('http://jam.smpark.in/updateProfile', headers: { 'email': email, 'password': password },
+    final response = await http.post(globals.server + '/updateProfile', headers: { 'email': email, 'password': password },
         body: { 'bio': globals.bio, 'about_me': globals.about, 'pic_path': "" } );
 
     print(response.body + " " + response.statusCode.toString());
@@ -599,7 +607,7 @@ class photoPromptState extends State<photoPrompt> {
     var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
     var length = await file.length();
 
-    var uri = Uri.parse('http://jam.smpark.in/upload');
+    var uri = Uri.parse(globals.server + '/upload');
 
     var request = new http.MultipartRequest("POST", uri);
 

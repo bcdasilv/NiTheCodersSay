@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:path_provider/path_provider.dart';
 
 class initialView extends StatefulWidget {
 
@@ -22,7 +23,7 @@ class initialViewState extends State<initialView> {
       String email = result.getString('email');
       String password = result.getString('password');
       if (email != null && password != null) {
-        http.post('http://jam.smpark.in/login', body: { 'email': email, 'password': password } ).then((response) {
+        http.post(globals.server + '/login', body: { 'email': email, 'password': password } ).then((response) {
 
           if(response.statusCode == 200) {
             globals.id = json.decode(response.body.replaceAll("'", '"'))['userid'];
@@ -36,13 +37,17 @@ class initialViewState extends State<initialView> {
   }
 
   void _getPhoto(String id) async {
-    http.Response response = await http.get('http://jam.smpark.in/static/images/' + id);
-    var filePath = await ImagePickerSaver.saveFile(
-        fileData: response.bodyBytes);
-    if (filePath.length == 0) {
+    var response = await http.get(globals.server +'/static/images/' + id);
+    if (response.statusCode != 200) {
       return;
     }
-    globals.profilePhoto = File(filePath);
+    var documentDirectory = await getApplicationDocumentsDirectory();
+    var firstPath = documentDirectory.path + "/images";
+    var filePathAndName = documentDirectory.path + '/images/profile.jpg';
+    await Directory(firstPath).create(recursive: true);
+    File file2 = new File(filePathAndName);
+    file2.writeAsBytesSync(response.bodyBytes);
+    globals.profilePhoto = file2;
   }
 
 //  String email = prefs.getString('email');

@@ -211,6 +211,7 @@ def updateUser():
     except:
         return Response("{'error':'Not all User fields provided'}", status=400, mimetype='application/json')
 
+
     user = Users.query.filter_by(email=email).first()
     if user == None:
         return Response("{'error':'No such user'}", status=422, mimetype='application/json')
@@ -232,6 +233,13 @@ def updateUser():
 
     db.session.commit()
     return Response("{'status':'User updated in db'}", status=200, mimetype='application/json')
+
+  
+def verifyZipcode(zip1):
+    z1 = select_zipcode(zip1)
+    if not (z1):
+        return False
+    return True
 
 
 @bp.route('/getUser', methods=["GET"])
@@ -334,7 +342,7 @@ def getProfile():
     about_me = profile.about_me
     bio = profile.bio
     return jsonify(name=name, about_me=about_me, bio=bio)
-  
+
 
 @bp.route('/match', methods=["POST"])
 def match():

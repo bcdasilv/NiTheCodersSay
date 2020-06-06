@@ -50,6 +50,18 @@ class _MyProfileView extends State<myProfileView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20.0),
+                            child: RaisedButton(
+                              child: Text('Edit Personal Info'),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/editUser');
+                              },
+                            ),
+                          )
+                      ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 15.0),
                         child: CircleAvatar(
@@ -147,7 +159,8 @@ class _MyProfileView extends State<myProfileView> {
     Map<String, String> header = {'email': email, 'password': password };
 
     print('sending get profile request');
-    var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+
+    var response = await http.get(globals.server + '/getProfile', headers: header);
 
     print(response.body);
 
@@ -164,6 +177,10 @@ class _MyProfileView extends State<myProfileView> {
     globals.bio = '';
     globals.name= '';
     globals.about= '';
+    globals.email = '';
+    globals.username = '';
+    globals.zipcode = '';
+    globals.dob = '';
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);

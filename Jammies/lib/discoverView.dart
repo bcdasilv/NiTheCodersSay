@@ -36,6 +36,21 @@ class Post {
 class _DiscoverView extends State<discoverView> {
   var client = http.Client();
 
+  List<Widget> postList;
+  Future<List<Post>> futurePosts;
+
+  final _formKey = GlobalKey<FormState>();
+  final titleController = TextEditingController();
+  final bodyController = TextEditingController();
+
+  List<Post> posts;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    futurePosts = populatePosts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +59,7 @@ class _DiscoverView extends State<discoverView> {
         IconButton(
           icon: globals.profilePhoto == null
               ? FadeInImage(
-                image: NetworkImage('http://jam.smpark.in/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
+                image: NetworkImage(globals.server + '/static/images/' + globals.id), placeholder: AssetImage("assets/icon/icon.png")
               )
               : Image.file(globals.profilePhoto),
           iconSize: 50,
@@ -224,13 +239,13 @@ class _DiscoverView extends State<discoverView> {
     String email = prefs.getString('email');
     String password = prefs.getString('password');
 
-    var uri = Uri.parse('http://jam.smpark.in/makePost');
+    var uri = Uri.parse(globals.server + '/makePost');
 
     Map<String, String> header = {'email': email, 'password': password};
 
 
 
-    final response = await http.post('http://jam.smpark.in/makePost',
+    final response = await http.post(globals.server + '/makePost',
         headers: header,
         body: { 'title': titleController.text, 'body': bodyController.text } );
     print(response.statusCode);
@@ -245,7 +260,7 @@ class _DiscoverView extends State<discoverView> {
     Map<String, String> header = {'email': email, 'password': password};
     List<Post> posts = [];
 
-    final response = await http.get('http://jam.smpark.in/getPost', headers: header);
+    final response = await http.get(globals.server + '/getPost', headers: header);
     Map<String, dynamic> postListResponse = json.decode(response.body);
     var postList = postListResponse['posts'].map((value) => Post.fromJson(value)).toList();
 
@@ -256,7 +271,7 @@ class _DiscoverView extends State<discoverView> {
         'password': password,
         'userid': currPost.authorid.toString()
       };
-      var response = await http.get('http://jam.smpark.in/getProfile', headers: header);
+      var response = await http.get(globals.server + '/getProfile', headers: header);
 
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
       currPost.author = jsonResponse['name'];
@@ -273,13 +288,15 @@ class _DiscoverView extends State<discoverView> {
       var currPost = posts[i];
       postList.add(
         Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
           Container(
             height: 100,
             width: 150,
             child: FadeInImage(
-              image: NetworkImage('http://jam.smpark.in/static/images/' + currPost.authorid.toString()), placeholder: AssetImage("assets/icon/icon.png"),
+              image: NetworkImage(globals.server + '/static/images/' + currPost.authorid.toString()), placeholder: AssetImage("assets/icon/icon.png"),
               fit: BoxFit.scaleDown,
             ),
           ),
@@ -311,7 +328,7 @@ class _DiscoverView extends State<discoverView> {
 
           ],
         ),
-
+          ),
         ),
       );
     }
